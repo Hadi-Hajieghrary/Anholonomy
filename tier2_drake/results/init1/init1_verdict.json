@@ -1,0 +1,13 @@
+{
+ "median_deg": {
+  "sigma": 0.8778972892655463,
+  "sigma_i": 0.8637377829259668
+ },
+ "max_deg": {
+  "sigma": 2.5387961478532164,
+  "sigma_i": 2.391586292147678
+ },
+ "seeds": 50,
+ "gate": "median<2deg, max<5deg",
+ "passed": true
+}

@@ -1,0 +1,17 @@
+{
+ "cfg": {
+  "master_seed": 42,
+  "Tend": 30.0,
+  "tau": 0.4,
+  "l": 12.0,
+  "kappa_gain": 2.0,
+  "send_epoch": 0.1,
+  "noise_on": true
+ },
+ "tag": "run2",
+ "sha256": "2b8af5cc63a1930d715a89c4694fef5d5123b6c51dd5f55c7722da105ff8a503",
+ "wall_s": 3.699510874997941,
+ "sim_s": 30.0,
+ "realtime_factor": 0.12331702916659802,
+ "n_fusion_records": 296
+}

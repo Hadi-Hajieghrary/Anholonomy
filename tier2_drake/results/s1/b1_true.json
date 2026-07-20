@@ -1,0 +1,30 @@
+{
+ "arm": "B1-replay-lite (centralized WLS, naive sigma-chains) \u2014 NOT the plan's B1 oracle",
+ "anchored": 22.34793004270722,
+ "perp": null,
+ "D": 0.0,
+ "drift": 0.9927936113400734,
+ "err": 0.409398621670324,
+ "per_seed": [
+  {
+   "seed": 0,
+   "anchored": 25.830172503806935,
+   "err": 0.4467999946349462,
+   "drift": 1.002337994963897
+  },
+  {
+   "seed": 1,
+   "anchored": 19.774987749060024,
+   "err": 0.38552863918189617,
+   "drift": 1.040003921151364
+  },
+  {
+   "seed": 2,
+   "anchored": 21.438629875254694,
+   "err": 0.39586723119412953,
+   "drift": 0.9360389179049586
+  }
+ ],
+ "finding": "Negative result, kept deliberately: zero-latency centralized pooling with exact WLS covariance but naive sigma-chains yields D=0 and 40% lower pre-anchor drift (1.0 vs 1.68 m), yet 2.2x WORSE steady-state accuracy (0.41 vs 0.183 m) than the decentralized DIEKF record. The record's Joseph-form direction updates and network-diffused anchor information carry real accuracy. True B1 (full joint EKF: shared G + per-agent sigma/bias states with cross-covariances) pends the D7 campaign.",
+ "record_err_same_config": 0.1831
+}

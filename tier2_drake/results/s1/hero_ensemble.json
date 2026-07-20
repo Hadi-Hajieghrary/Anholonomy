@@ -1,0 +1,78 @@
+{
+ "rule": "ensemble median D_ss over [100,400] s, 12-seed v1 subset (t_on=410)",
+ "hero_seed": 3,
+ "ensemble": [
+  {
+   "seed": 0,
+   "D": 0.030815,
+   "dock_pos_max": 3.177,
+   "dock_yaw_max_deg": 0.78
+  },
+  {
+   "seed": 1,
+   "D": 0.034307,
+   "dock_pos_max": 0.808,
+   "dock_yaw_max_deg": 0.55
+  },
+  {
+   "seed": 2,
+   "D": 0.059224,
+   "dock_pos_max": 0.758,
+   "dock_yaw_max_deg": 0.11
+  },
+  {
+   "seed": 3,
+   "D": 0.03981,
+   "dock_pos_max": 2.165,
+   "dock_yaw_max_deg": 0.41
+  },
+  {
+   "seed": 4,
+   "D": 0.057578,
+   "dock_pos_max": 1.058,
+   "dock_yaw_max_deg": 0.32
+  },
+  {
+   "seed": 5,
+   "D": 0.06627,
+   "dock_pos_max": 0.585,
+   "dock_yaw_max_deg": 0.25
+  },
+  {
+   "seed": 6,
+   "D": 0.020855,
+   "dock_pos_max": 1.573,
+   "dock_yaw_max_deg": 0.56
+  },
+  {
+   "seed": 7,
+   "D": 0.030385,
+   "dock_pos_max": 0.765,
+   "dock_yaw_max_deg": 0.22
+  },
+  {
+   "seed": 8,
+   "D": 0.10649,
+   "dock_pos_max": 22.512,
+   "dock_yaw_max_deg": 4.95
+  },
+  {
+   "seed": 9,
+   "D": 0.011477,
+   "dock_pos_max": 1.303,
+   "dock_yaw_max_deg": 0.48
+  },
+  {
+   "seed": 10,
+   "D": 0.063854,
+   "dock_pos_max": 5.518,
+   "dock_yaw_max_deg": 1.27
+  },
+  {
+   "seed": 11,
+   "D": 0.024264,
+   "dock_pos_max": 3.316,
+   "dock_yaw_max_deg": 1.43
+  }
+ ]
+}
