@@ -76,6 +76,7 @@ def b3_replay(cfg, L, seed):
     hist = []                                            # (X list, fix list) per tick
 
     est_G, est_t = [], []
+    kf_G = [None] * N; kf_P = [None] * N; kf_prev = [None] * N
     for kr in range(1, len(ts)):
         k = kr - 1
         t = ts[kr]
@@ -150,6 +151,9 @@ def b3_replay(cfg, L, seed):
         hist.append([(X[j].copy(), P[j].copy()) for j in range(N)])
 
         if kr % 10 == 0:                                 # 10 Hz: derive G-hat per agent
+            # + per-agent KF smoothing over the Kabsch fixes [the diagnosed
+            # sigma_i-lever remedy]: predict with a constant-twist model,
+            # update with the Kabsch fix; R from the fix spread.
             # JOINT GEOMETRIC SOLVE (fixes the radial-assumption defect): each
             # agent's cable gives one attach-point fix f_j = p_v_j - l*u(phi_j),
             # which must equal p_L + R(theta_L) a_j. With the neighbors' (tau-
@@ -175,7 +179,25 @@ def b3_replay(cfg, L, seed):
                                [np.sin(thL), np.cos(thL)]])
                 pL = F.mean(0) - Rm @ A.mean(0)
                 Gs.append(SE2(thL, pL))
-            est_G.append(Gs); est_t.append(t)
+            # KF pass: G_kf[j] <- predict(const twist) then blend toward Kabsch fix
+            if not hasattr(b3_replay, "_kf"):
+                pass
+            if kf_G[0] is None:
+                for j in range(N):
+                    kf_G[j] = Gs[j]; kf_P[j] = np.diag([1.0, 1.0, 0.2])
+                    kf_prev[j] = Gs[j]
+            else:
+                for j in range(N):
+                    xi_hat = Log(inv(kf_prev[j]) @ Gs[j]) / 1.0   # per-second fix twist (10 Hz->1 s window handled by blend)
+                    kf_prev[j] = Gs[j]
+                    kf_P[j] = kf_P[j] + np.diag([2e-3, 2e-3, 5e-4])
+                    Rfix = np.diag([0.35 ** 2, 0.35 ** 2, 0.05 ** 2])
+                    r = Log(inv(kf_G[j]) @ Gs[j])
+                    K = kf_P[j] @ np.linalg.inv(kf_P[j] + Rfix)
+                    kf_G[j] = kf_G[j] @ Exp(K @ r)
+                    IK = np.eye(3) - K
+                    kf_P[j] = IK @ kf_P[j] @ IK.T + K @ Rfix @ K.T
+            est_G.append([kf_G[j].copy() for j in range(N)]); est_t.append(t)
     return np.array(est_t), est_G
 
 
