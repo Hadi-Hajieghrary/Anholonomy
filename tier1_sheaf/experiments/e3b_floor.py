@@ -117,10 +117,16 @@ def run(tau: float, form_id: int, seed: int, *, fuse_rule="paper",
     assert lag >= 1 and abs(lag * DCr - tau) < 1e-9, \
         f"tau={tau} not representable on the DC={DCr} send grid"  # P-class exactness
     if edges is None:
-        edges = [(j, (j + 1) % N) for j in range(N)]        # C_N cycle default
-    nbrs = [[] for _ in range(N)]
-    for a, b in edges:
-        nbrs[a].append(b); nbrs[b].append(a)
+        # default C_N cycle with the ORIGINAL consume order ((j-1)%N, (j+1)%N):
+        # the committed e3b/e3c/e10/matched campaigns were produced with this
+        # order, and the fusion sequence is order-sensitive at the ~0.7% level
+        # [caught by campaign_replay.py]. Explicit edge lists (E6) keep
+        # edge-list order.
+        nbrs = [[(j - 1) % N, (j + 1) % N] for j in range(N)]
+    else:
+        nbrs = [[] for _ in range(N)]
+        for a, b in edges:
+            nbrs[a].append(b); nbrs[b].append(a)
     ring: list[list] = [[] for _ in range(N)]               # per-agent tx history
     stamps = np.full((N, max(len(x) for x in nbrs)), -1.0)  # newest consumed stamp
     # one-period-stale measurement buffers: the Drake leaf's port Eval reads the

@@ -1,0 +1,152 @@
+% RA-L Blind Harbor companion — manuscript draft skeleton (assembled from
+% docs/ral_package.md; every number traceable via campaign_replay.py)
+\documentclass[letterpaper, 10pt, journal]{IEEEtran}
+\usepackage{graphicx, amsmath, amssymb, booktabs}
+\graphicspath{{../../tier2_drake/results/s1/}{../../tier1_sheaf/results/}}
+
+\title{The Price of Staleness: Distributed Invariant Estimation for\\
+GNSS-Denied Multi-Vessel Cable Towing}
+\author{Hadi Hajieghrary% <- author list TBD
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Cooperative towing couples every vessel's motion through the shared load, and
+each taut cable transfers exactly one scalar of load-motion information. We
+present DIEKF-$\Sigma$, a distributed invariant extended Kalman filter that
+treats the cable constraints as a measurement channel and fuses delayed
+inter-vessel packets through shape-conjugated transports---the estimator induced
+by the constraint-based estimation sheaf of the companion paper. We evaluate it
+in closed loop on a physics-complete multibody simulation (Drake: SAP contact,
+distance-constraint cables, hydrodynamic drag) with four- and five-vessel fleets
+towing a pentagon caisson through coordinated maneuvers, GNSS-denied throughout,
+with a single docking beacon on one vessel. We report three findings. First, a
+single anchor pins the entire fleet's estimate through fusion alone: beacon
+activation momentarily \emph{breaks} inter-vessel agreement before the pin
+propagates---the gauge-pinning corollary acting in closed loop. Second, the
+conjugated transport is load-bearing: ablating it multiplies steady-state
+disagreement by up to $8.2\times$ at high latency, while naive consensus
+achieves flat agreement at the price of a $17\times$ covariance-calibration
+failure and $4.4\times$ the drift of running no fusion at all. Third, under a
+pre-registered protocol with in-situ noise-floor controls, the conjectured
+second-order scaling of the closed-loop disagreement floor is \emph{falsified}
+at these scales on two independent plants (measured slope $\approx$1.05--1.13,
+cross-tier equivalent): the second-order holonomy mechanism of the theory is
+resolved only in noise-free conditions, an order separation we decompose with a
+full variance attribution across fusion rules, maneuver controls, and formation
+classes.
+\end{abstract}
+
+\section{Introduction}
+% - GNSS-denied harbor operations; the Blind Harbor Task premise: no GNSS, no
+%   relative-pose sensing; own odometry + own cable channel only.
+% - Contribution list = the three abstract findings + the reproducible campaign.
+% - Epistemic framing up front: three measured exponents, three distinct objects
+%   (state mismatch / closed-loop floor / error-transport holonomy).
+
+\section{Related work}
+% - Distributed/invariant KF; CI and correlated fusion; delayed/OOSM fusion;
+%   cable-towed multi-robot systems; sheaf-theoretic estimation (companion).
+
+\section{The Blind Harbor task and the estimator}
+% - Task spec (sim\_design): N vessels, pentagon caisson, taut cables, C_N comms
+%   with latency tau, single docking beacon in the final approach.
+% - DIEKF-Sigma: propagate (bias-corrected slaved twist), direction channel,
+%   executed-composite fusion rule (transport telescopes to a*xi_self),
+%   Joseph-form updates, decorrelated CI, Friedland drift trim.
+% - Calibration disclosure (MANDATORY, ledger row M-FAB): anchored ANEES 3.96
+%   within the author-ruled [0.8, 5.0] gate; the plan's original [0.8, 1.3] gate
+%   is not met and the complement sanity bound failed (3.35 > 1.3): the filter
+%   is 3--4x optimistic, a structural property of CI over correlated estimates.
+
+\section{Two plants, one estimator}
+% - Tier-1 reduced kinematic plant (shape ODEs) and Drake multibody plant;
+%   identical estimator config on both (incl. shape-motion correction OFF).
+% - Independence line (plan §6, verbatim): plants, integrators, constraint
+%   solvers, tension recovery, and shape evolution are independent; the
+%   estimator, metric functional, window rules, and fit code are deliberately
+%   shared, so that agreement is a statement about the algorithm on two plants
+%   and any disagreement localizes to the plant.
+
+\section{Results}
+
+\subsection{Gauge pinning (Cor.~5.2 in closed loop)}
+% Hero transit: Fig dogleg montage + D(t) spike-at-acquisition; scorecard with
+% anchored/mean/max rows (diffusion-limited far agents disclosed).
+
+\subsection{The theorem's object, measured on both plants}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{f4a_overlay.pdf}
+  \caption{Error-transport holonomy amplitude on both plants. Thm~7.2
+  (leading-order, deterministic): Tier-1 slope 1.999 with switch-offs at machine
+  zero; Drake slope 2.000 with the $m{=}2$ coefficient check at 1.0000, the
+  $\eta{=}0$ switch-off at machine zero, and the parallel class suppressing the
+  coefficient $31\times$ (achieved-$\varepsilon$; exact cancellation remains the
+  Tier-1 machine-zero result).}
+  \label{fig:f4a}
+\end{figure}
+
+\subsection{The closed-loop floor: the conjecture falsified, coherently}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{f4b_overlay.pdf}
+  \caption{Tier-1/Tier-2 agreement on the conjectured steady-state floor
+  ([ES~\S10(ii)]). Panel~(a) separately tests the leading-order, deterministic
+  holonomy amplitude of Thm~7.2 in both tiers. With $D_0$ measured in situ by
+  straight-tow controls, the fitted excess exponents are 1.101 [1.076, 1.125]
+  (Tier-1) and 1.077 [1.054, 1.102] (Drake); the pre-registered equivalence test
+  passes ($+0.023$ [$-0.012$, $+0.057$] $\subset$ [$-0.2$, $0.2$]) and the
+  conjectured order~2 is excluded on both plants. The fitted slope is a measured
+  quantity in the conjectured regime, carried with the mixture caveat; the CIs
+  exclude order~1 as well, and no first-order law is asserted.}
+  \label{fig:f4b}
+\end{figure}
+
+\subsection{Variance attribution: what makes up disagreement}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{f4c_variance_attribution.pdf}
+  \caption{All Drake arms on matched formation draws. Ablating the conjugated
+  transport (A2) runs $1.7\times\!\to\!8.2\times$ above the paper rule with
+  growing $\tau$; naive consensus (A1) holds disagreement flat and low---by
+  groupthink (anchored ANEES 62, drift 8.4~m): agreement alone is never a virtue
+  metric. The straight-tow control shows the motion excitation
+  ($19$--$21\times$ at every $\tau$).}
+  \label{fig:f4c}
+\end{figure}
+
+\subsection{Symmetry: protection lives on the amplitude object}
+% F5 (two panels, never mixed) + C9c trip on both tiers + the 31x/2x contrast.
+
+\subsection{Cross-tier coefficients and the validity domain}
+% The x5 reference-matched ratio; Q_XI-off localization (baseline agrees to
+% 12%); inertia-free shape response; Drake realized shapes exit the reduced
+% model's stable domain (validity-domain finding).
+
+\subsection{Numerics defense}
+% E10 (exponent Delta-t-invariant over 10x) and D8 (h-invariant; convergence
+% verified genuine by direct truth-trajectory differencing, 1.35 mm / 30 s).
+
+\section{Discussion}
+% - The epistemic ladder as data; falsification as a design outcome of
+%   pre-registration; the baseline bring-up difficulties (delay-consistent
+%   innovation, residual frame transport) are the pitfalls the conjugated
+%   transport handles by construction.
+% - Scope: definitive fusion-rule ranking awaits the D7 docking scorecard
+%   (pending); Tier-1 A2 ordering inversion documented.
+
+\section{Reproducibility}
+Every number in this paper traces to a seeded, versioned driver and a committed
+data file; \texttt{campaign\_replay.py} re-executes per-run probes that must
+match the committed records exactly (Tier-1 to $10^{-9}$; Drake to $10^{-6}$),
+and \texttt{--run CELL} regenerates any full campaign.
+
+\section{Conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}
