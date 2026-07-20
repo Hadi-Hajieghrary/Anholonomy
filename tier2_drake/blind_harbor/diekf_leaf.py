@@ -32,7 +32,8 @@ class DIEKFSigmaLeaf(LeafSystem):
                  n_neighbors: int = 1, fuse_rule: str = "paper",
                  covariance: str = "ci", weights: str = "A3",
                  send_epoch: float = 0.1, bias_update: bool = False,
-                 has_beacon: bool = False, attach=(0.0, 0.0)):
+                 has_beacon: bool = False, attach=(0.0, 0.0),
+                 guard: bool = True):
         super().__init__()
         self._attach = np.asarray(attach, dtype=float)[:2]
         self._id = int(agent_id)
@@ -45,6 +46,7 @@ class DIEKFSigmaLeaf(LeafSystem):
         self._bias_up = bool(bias_update)
         self._send_ticks = int(round(send_epoch / _TICK))
         assert abs(self._send_ticks * _TICK - send_epoch) < 1e-12
+        self._guard_cos = 0.1 if guard else 0.0
         self.records: list[ec.FusionRecord] = []
 
         st0 = ec.FilterState.initial(s0, l)
@@ -145,7 +147,7 @@ class DIEKFSigmaLeaf(LeafSystem):
             st = ec.propagate(st, zeta, 0.02, shape_motion_correction=False)
         if k % 5 == 1:                                        # (3) update, 20 Hz (+10 ms)
             sig_i, kappa = self._dir.Eval(context)
-            st = ec.update_direction(st, sig_i, kappa)
+            st = ec.update_direction(st, sig_i, kappa, guard_cos=self._guard_cos)
         if self._beacon is not None and k % 20 == 3:          # (4) beacon, 5 Hz [SPEC]
             b = self._beacon.Eval(context)
             if b[3] > 0.5:

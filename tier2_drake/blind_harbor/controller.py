@@ -25,11 +25,15 @@ __all__ = ["HydroDrag", "Thruster", "EstController", "PLANT_SIDE_CLASSES"]
 class HydroDrag(LeafSystem):
     """Linear drag on load + vessels. Plant-side by class (lint-exempt)."""
 
-    def __init__(self, cfg, load_idx, asv_idxs):
+    def __init__(self, cfg, load_idx, asv_idxs, gust=None):
         super().__init__()
         self._cfg = cfg
         self._load = load_idx
         self._asvs = asv_idxs
+        # gust = (agent_idx, t_start, t_end, Fy_world): a scripted lateral
+        # environmental force on one vessel (D10(c) broadside set piece).
+        # Plant-side physics by class — truth-free information flow.
+        self._gust = tuple(gust) if gust is not None else None
         self._V_in = self.DeclareAbstractInputPort(
             "body_spatial_velocities", Value([SpatialVelocity()]))
         self.DeclareAbstractOutputPort(
@@ -54,6 +58,15 @@ class HydroDrag(LeafSystem):
         drag(self._load, cfg.drag_lin_load, cfg.drag_ang_load)
         for ai in self._asvs:
             drag(ai, cfg.drag_lin_asv, cfg.drag_ang_asv)
+        if self._gust is not None:
+            gi, t0, t1, fy = self._gust
+            t = context.get_time()
+            if t0 <= t <= t1:
+                easf = ExternallyAppliedSpatialForce()
+                easf.body_index = self._asvs[int(gi)]
+                easf.p_BoBq_B = np.zeros(3)
+                easf.F_Bq_W = SpatialForce(np.zeros(3), np.array([0.0, fy, 0.0]))
+                forces.append(easf)
         output.set_value(forces)
 
 

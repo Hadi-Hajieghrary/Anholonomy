@@ -28,7 +28,7 @@ import estimator_core as ec
 from tier1_sheaf.core.se2 import SE2, Log, inv
 from tier2_drake.harbor import (ScenarioConfig, _planar_box_body, _planar_disk_body,
                                 attachment_and_start)
-from tier2_drake.blind_harbor.comms import VectorRingDelay, T_C
+from tier2_drake.blind_harbor.comms import VectorRingDelay, DropJitterGate, T_C
 from tier2_drake.blind_harbor.sensors import SensorSuite
 from tier2_drake.blind_harbor.diekf_leaf import DIEKFSigmaLeaf, state_len
 from tier2_drake.blind_harbor.controller import HydroDrag, Thruster, EstController
@@ -81,7 +81,8 @@ def build_s1(cfg, master_seed: int):
     plant.mutable_gravity_field().set_gravity_vector([0, 0, 0])
     plant.Finalize()
 
-    hydro = builder.AddSystem(HydroDrag(scen, load.index(), [b.index() for b in asvs]))
+    hydro = builder.AddSystem(HydroDrag(scen, load.index(), [b.index() for b in asvs],
+                                       gust=cfg.get("gust")))
     hydro.set_name("hydro_drag")
     thr = builder.AddSystem(Thruster([b.index() for b in asvs]))
     thr.set_name("thruster")
@@ -125,6 +126,7 @@ def build_s1(cfg, master_seed: int):
                                                 fuse_rule=cfg.get("fuse_rule", "paper"),
                                                 covariance="ci",
                                                 weights=cfg.get("weights", "A3"),
+                                                guard=cfg.get("guard", True),
                                                 has_beacon=(i == 0 or bool(cfg.get("all_beacons")))))
         # NOTE: attach deliberately NOT passed yet — the lever+σ̂-reconstruction
         # interplay produced indefinite P [measured]; enable with the radial
@@ -154,7 +156,15 @@ def build_s1(cfg, master_seed: int):
             ring = builder.AddSystem(VectorRingDelay(k_delay))
             ring.set_name(f"ring_{src}_to_{j}")
             builder.Connect(leaves[src].GetOutputPort("pkt_out"), ring.GetInputPort("pkt_in"))
-            builder.Connect(ring.GetOutputPort("pkt_out"), leaves[j].GetInputPort(f"pkt_in_{slot}"))
+            if cfg.get("drop_p", 0.0) > 0.0 or cfg.get("jitter_ticks", 0) > 0:
+                gate = builder.AddSystem(DropJitterGate(
+                    cfg.get("drop_p", 0.0), cfg.get("jitter_ticks", 0),
+                    seed=master_seed * 1000 + src * 16 + j))
+                gate.set_name(f"gate_{src}_to_{j}")
+                builder.Connect(ring.GetOutputPort("pkt_out"), gate.GetInputPort("pkt_in"))
+                builder.Connect(gate.GetOutputPort("pkt_out"), leaves[j].GetInputPort(f"pkt_in_{slot}"))
+            else:
+                builder.Connect(ring.GetOutputPort("pkt_out"), leaves[j].GetInputPort(f"pkt_in_{slot}"))
 
     logs = {"truth": LogVectorOutput(plant.get_state_output_port(), builder, 0.1)}
     for i in range(N):
