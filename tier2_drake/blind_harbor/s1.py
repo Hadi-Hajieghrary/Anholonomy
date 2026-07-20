@@ -119,10 +119,12 @@ def build_s1(cfg, master_seed: int):
         builder.Connect(sens.GetOutputPort("direction"), ctrl.GetInputPort("direction"))
         builder.Connect(sens.GetOutputPort("odom"), ctrl.GetInputPort("odom"))
         s0 = np.array([starts[i][2], 0.0])
+        deg_i = (N - 1) if cfg.get("topology", "cycle") == "complete" else 2
         leaf = builder.AddSystem(DIEKFSigmaLeaf(s0, cfg["l"], alpha, agent_id=i,
-                                                n_neighbors=2,
+                                                n_neighbors=deg_i,
                                                 fuse_rule=cfg.get("fuse_rule", "paper"),
-                                                covariance="ci", weights="A3",
+                                                covariance="ci",
+                                                weights=cfg.get("weights", "A3"),
                                                 has_beacon=(i == 0 or bool(cfg.get("all_beacons")))))
         # NOTE: attach deliberately NOT passed yet — the lever+σ̂-reconstruction
         # interplay produced indefinite P [measured]; enable with the radial
@@ -139,11 +141,16 @@ def build_s1(cfg, master_seed: int):
         builder.Connect(ctrls[i].GetOutputPort("command"), mux.get_input_port(i))
     builder.Connect(mux.get_output_port(0), thr.GetInputPort("commands"))
 
-    # comms fabric: cycle graph, one ring per DIRECTED edge; receiver port order
-    # [from (j-1) mod N, from (j+1) mod N] — fixed, deterministic
+    # comms fabric: one ring per DIRECTED edge; receiver port order fixed and
+    # deterministic. Default cycle keeps the record's ((j-1)%N, (j+1)%N) order;
+    # topology="complete" (D9) wires all-to-all in ascending-src order.
     k_delay = int(round(cfg["tau"] / T_C))
+    if cfg.get("topology", "cycle") == "complete":
+        nbr_lists = [[m for m in range(N) if m != j] for j in range(N)]
+    else:
+        nbr_lists = [[(j - 1) % N, (j + 1) % N] for j in range(N)]
     for j in range(N):
-        for slot, src in enumerate(((j - 1) % N, (j + 1) % N)):
+        for slot, src in enumerate(nbr_lists[j]):
             ring = builder.AddSystem(VectorRingDelay(k_delay))
             ring.set_name(f"ring_{src}_to_{j}")
             builder.Connect(leaves[src].GetOutputPort("pkt_out"), ring.GetInputPort("pkt_in"))
