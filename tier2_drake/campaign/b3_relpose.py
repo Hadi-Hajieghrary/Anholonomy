@@ -4,11 +4,17 @@ DO NOT cite numbers from this driver in any table. Status 2026-07-20: two real
 bugs found and fixed during bring-up (systematic v*tau along-track pull from
 comparing current measurements against delayed estimates; neighbor-frame
 residual applied un-transported — the 10-20 m lever mis-rotates corrections).
-A third, structural defect remains: the load-yaw derivation theta_L = phi - ray
-assumes vessels sit radially on their attach rays, which the settled fan does
-not (sigma != ray at the operating point). The load derivation needs the joint
-geometric solve over the full cable spread. Best-yet: err 16.8 m vs record
-0.183 m — NOT a valid competitor measurement.
+Progress log: v4 installed the joint geometric solve (closed-form 2D Kabsch
+over attach-point fixes — removes the radial-ray assumption; 16.8 -> 3.18 m);
+v5 added the beacon yaw constraint via psi = theta_L + sigma - sigma_i
+(3.18 -> 2.06 m). DIAGNOSIS (isolation run, perfect vessel poses + measured
+sigma_i): the DERIVATION alone errs 1.50 m — the l = 12 m cable-angle lever
+amplifies sigma_i noise/lag through every fix; the pose graph contributes only
+~0.5 m. CONCLUSION for the D7 design session: a competitive B3 needs its own
+principled load-state filter (Kalman-weighted direction channel) on top of the
+vessel graph — i.e., it must re-derive the constraint-channel design under
+test, which is itself a thesis-relevant observation. Best-yet: err 2.06 m vs
+record 0.183 m — NOT a valid competitor measurement yet.
 
 Original design notes (plan §3.1/D7; QD2's granted sensor):
 
@@ -59,7 +65,7 @@ def b3_replay(cfg, L, seed):
     scen = ScenarioConfig(N=N, cable_len=l, formation=cfg.get("formation", "fan"),
                           front_arc=cfg.get("front_arc", 1.15),
                           perturb=cfg.get("perturb", 0.0))
-    _, starts, rays = attachment_and_start(scen)
+    attach, starts, rays = attachment_and_start(scen)
     lag = int(round(cfg["tau"] / 0.01))                  # comms delay in ticks
 
     X = [SE2(starts[j][2], np.array(starts[j][:2])) for j in range(N)]
@@ -117,13 +123,25 @@ def b3_replay(cfg, L, seed):
         if k % 20 == 2:                                  # 5 Hz beacon (agent 0)
             b = L["beacon"][kr]
             if b[3] > 0.5:
-                # load fix -> own-pose fix through own cable geometry
-                phi = np.arctan2(X[0].mat[1, 0] if hasattr(X[0], "mat") else X[0][1, 0],
-                                 X[0][0, 0]) + sig_i[0]
-                pv = np.array([b[0] + l * np.cos(phi), b[1] + l * np.sin(phi)])
-                zX = SE2(np.arctan2(X[0][1, 0], X[0][0, 0]), pv)  # position fix only
+                # load fix -> own-pose fix through own cable geometry:
+                # position from the attach point + cable direction; YAW from the
+                # identity psi = theta_L + sigma - sigma_i with sigma computed
+                # from the beacon's load pose and own estimated position (the
+                # unconstrained-yaw variant lets agent 0's yaw random-walk and
+                # rotates every Kabsch fix it contributes [measured: 3.2 m])
+                thL_b = float(b[2])
+                Rb2 = np.array([[np.cos(thL_b), -np.sin(thL_b)],
+                                [np.sin(thL_b), np.cos(thL_b)]])
+                attach_w = np.asarray(b[:2]) + Rb2 @ attach[0][:2]
+                d = X[0][:2, 2] - attach_w
+                sigma0 = np.arctan2(d[1], d[0]) - thL_b
+                psi0 = thL_b + sigma0 - sig_i[0]
+                phi = psi0 + sig_i[0]
+                pv = attach_w + l * np.array([np.cos(phi), np.sin(phi)])
+                zX = SE2(psi0, pv)
                 r = Log(inv(X[0]) @ zX)
-                Rb = np.diag([0.05 ** 2 + (l * np.radians(1)) ** 2] * 2 + [1e6])
+                Rb = np.diag([0.05 ** 2 + (l * np.radians(1)) ** 2] * 2 +
+                             [np.radians(2.0) ** 2])
                 S = P[0] + Rb
                 K = P[0] @ np.linalg.inv(S)
                 X[0] = X[0] @ Exp(K @ r)
@@ -132,12 +150,30 @@ def b3_replay(cfg, L, seed):
         hist.append([(X[j].copy(), P[j].copy()) for j in range(N)])
 
         if kr % 10 == 0:                                 # 10 Hz: derive G-hat per agent
+            # JOINT GEOMETRIC SOLVE (fixes the radial-assumption defect): each
+            # agent's cable gives one attach-point fix f_j = p_v_j - l*u(phi_j),
+            # which must equal p_L + R(theta_L) a_j. With the neighbors' (tau-
+            # delayed) exchanged fixes, (p_L, theta_L) is closed-form 2D Kabsch
+            # over known correspondences a_j <-> f_j.
+            idxd = max(kr - lag, 0)
             Gs = []
             for j in range(N):
-                psi = np.arctan2(X[j][1, 0], X[j][0, 0])
-                phi = psi + sig_i[j]
-                pL = X[j][:2, 2] - l * np.array([np.cos(phi), np.sin(phi)])
-                thL = _wrap(phi - rays[j])
+                mem = [j, (j - 1) % N, (j + 1) % N]
+                fs, as_ = [], []
+                for m in mem:
+                    Xm, _ = (hist[idxd][m] if m != j and idxd < len(hist)
+                             else (X[m], None))
+                    psim = np.arctan2(Xm[1, 0], Xm[0, 0])
+                    phim = psim + sig_i[m]
+                    fs.append(Xm[:2, 2] - l * np.array([np.cos(phim), np.sin(phim)]))
+                    as_.append(attach[m][:2])
+                F = np.array(fs); A = np.array(as_)
+                Fc, Ac = F - F.mean(0), A - A.mean(0)
+                H = Ac.T @ Fc
+                thL = np.arctan2(H[1, 0] - H[0, 1], H[0, 0] + H[1, 1])
+                Rm = np.array([[np.cos(thL), -np.sin(thL)],
+                               [np.sin(thL), np.cos(thL)]])
+                pL = F.mean(0) - Rm @ A.mean(0)
                 Gs.append(SE2(thL, pL))
             est_G.append(Gs); est_t.append(t)
     return np.array(est_t), est_G
