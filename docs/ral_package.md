@@ -4,9 +4,11 @@
 GNSS-Denied Multi-Vessel Cable Towing*
 
 **Abstract:** as drafted 2026-07-19; findings (i) and (iii) are measured,
-adjudicated, and numerics-defended below; finding (ii)'s rule-ranking clause
-rests on the Drake arms and the baselines pilot — its definitive head-to-head is
-the pending D7 scorecard (§4).
+adjudicated, and numerics-defended below. Finding (ii)'s rule-ranking clause
+rests on the D2 transport-rule arms plus the executed D7 baseline scorecard
+(50 transits: paper rule > naive consensus ≫ dead-reckoning on D and fleet-mean;
+B1-limit reference above all); the A2-inclusive rule head-to-head in the transit
+setting remains un-run.
 
 ---
 
@@ -26,16 +28,16 @@ the pending D7 scorecard (§4).
 | C9b | D_ss excess ε-exponent 2 | 2 ∉ CI | **falsifier condition MET on the declared (seed-paired) estimator**: 1.58 [1.44, 1.84] at every τ — 2 excluded (and 1 excluded); the registered single-power model is mis-specified for the evident linear+quadratic mixture (exploratory note: segment slopes rise 1.2→2.1; the R3 artifact class, here on the ε-axis). The unpaired estimator [0.43, 2.89] is UNDER-POWERED per the §1 convention (half-width 1.23 ≫ 0.2) and adjudicates nothing | e3c_c9b_seeds.json (`_paired_estimator`), F5(b) |
 | C9c | robust symmetric suppression ≥ 10× at τ=0.4 | S < 10× | **TRIPS on Tier-1** (robust arm: 2.75× [1.94, 3.89], jitter 20% + drops 10%). Drake comparator: 2.1× is the UNIFORM D4 fan/parallel ratio (no Drake robust arm exists yet). The ≥10× protection is an amplitude-object property only | e3c_robust.json; production_d2_d4_v2 (D4, uniform) |
 | C9a | full-cycle symmetric amplitude slope 3 | — | **Q3-BLOCKED** (α_k unresolved; never guessed) | author decision pending |
-| C18 | conjugated transport load-bearing | A2 ≈ paper rule | **PASSED on Drake** (A2 1.7→8.2× worse with τ); **ordering INVERTS on Tier-1** (regime-dependent; D_ss never ranks rules — definitive ranking awaits D7, which is PENDING §4) | d2_a1_a2_arms.json, F4c |
+| C18 | conjugated transport load-bearing | A2 ≈ paper rule | **PASSED on Drake** (A2 1.7→8.2× worse with τ); **ordering INVERTS on Tier-1** (regime-dependent; D_ss never ranks rules — the D7 baseline scorecard ran (see rows below); the A2-inclusive rule head-to-head in the transit setting remains un-run) | d2_a1_a2_arms.json, F4c |
 | C10 | topology dependence (open) | none (exploratory) | connectivity suppresses the floor at moderate τ (5×), benefit collapses at high τ (≤2×); complete graphs most τ-sensitive | e6_topology.json |
-| M-FAB / D1 | filter consistency | ANEES ∉ gate | **closed under the author-ruled [0.8, 5.0] gate** (3.96); complement sanity ≤1.3 **FAILED** (3.35) — disclosed wherever M-FAB is cited; filter ~3–4× optimistic (CI structural) | s1_verdict.json |
-| T2-C6 (D6) | tension/information channel carries estimation benefit | Part 1 ΔCI includes 0 | **Part 1 PASSES** (series weights: Δ shape-RMSE −8.4e-3 [−10.9e-3, −5.8e-3]); Part 2 dose-response **DROPPED per pre-registration** (CI includes 0; fan-position confound + 1.6× spread disclosed); finding: Σ_shape structurally insensitive to fusion weights (CI touches G-block only) | d6_tension.json |
+| M-FAB / D1 | filter consistency | ANEES ∉ gate | **closed under the author-ruled [0.8, 5.0] gate AT THE S1 HORIZON (130 s)** (3.96; re-confirmed at p=0 in D10b). **Does NOT transfer to 450 s transits** (ANEES 159–229 — see D7 scorecard row); complement sanity ≤1.3 **FAILED** (3.35); filter ~3–4× optimistic at the S1 horizon (CI structural). Every ANEES claim carries its horizon | s1_verdict.json, d7_scorecard.json |
+| T2-C6 (D6) | tension/information channel carries estimation benefit | Part 1 ΔCI includes 0 | **Part 1 PASSES** (series weights: Δ shape-RMSE −8.4e-3 [−10.9e-3, −5.8e-3]); Part 2 dose-response **DROPPED per pre-registration** (CI includes 0; fan-position confound + 1.65× spread disclosed); finding: Σ_shape structurally insensitive to fusion weights (CI touches G-block only) | d6_tension.json |
 | D9 | re-lock rate orders by λ₂ | Spearman CI includes 0 | **falsifier FIRES on the Cor 5.2 observable** (pin rate ρ=+0.04 ≈ 0: anchor-limited, not connectivity-limited); D re-agreement **anti-orders** (−0.51 [−0.65, −0.36]: stiff consensus resists the pin). With E2's in-domain pass, this is the ES-01 finding path, written up as such. Floor-vs-λ₂ trend clean (CONJ). Ring −2 row under-powered as pre-declared | d9_scaling.json, d9_topology.png |
-| D10(b) | loss/jitter robustness (characterization) | none; red-flag rules | **graceful**: floor +13% @ p=0.1, +45% @ p=0.3; anchored ANEES in-gate at p=0.3 (4.23). No red flags | d10b_loss.json |
-| D10(c) | broadside guard-save set piece | movie ships only if paired stats support it | **guard UNEXERCISED in the reachable envelope**: its trigger (σ̂_i) lags true broadside (true cos 0.027 vs σ̂ 0.106 at 5000 N) — ON≡OFF identical; set-piece does NOT ship; design note: lag-aware margin | d10c_guard.json |
+| D10(b) | loss/jitter robustness (characterization) | none; red-flag rules | **graceful**: floor +13% @ p=0.1, +45% @ p=0.3 (J=0 arm; jitter arm milder +9%/+38%); anchored ANEES in-gate at p=0.3 (4.23). No red flags | d10b_loss.json |
+| D10(c) | broadside guard-save set piece | movie ships only if paired stats support it | **guard UNEXERCISED in the reachable envelope**: its trigger (σ̂_i) lags true broadside (envelope probes, persisted: at 3500 N true/est min-cos 0.157/0.199 — never in the guard region, so the paired campaign could not exercise it; at 5000 N true 0.027 vs σ̂ 0.106) — ON≡OFF identical; set-piece does NOT ship; design note: lag-aware margin | d10c_guard.json (pairs + envelope_probe) |
 | D10(a) | slack events | — | **scoped out for v1 (author-ruled)**: bilateral distance-constraint cables cannot slack; validity-domain line; unilateral-cable plant = revision item | ruling 2026-07-20 |
-| D7 / B1 | centralized oracle | — | **B1 = the record's own zero-latency all-to-all limit: 6% gap** (0.172 vs 0.183 m; drift halved). Three re-architected centralized filters all ~0.42 m (2.3× worse) — the measurement architecture is where accuracy lives (C18 reinforced). B3: design-incomplete after 6 structural iterations (WIP, excluded; bring-up log = discussion material) | b1_joint.py, matched runs, b3_relpose.py |
-| D7 scorecard | 50-transit BHT table | — | **ordering holds**: B1lim > paper > B2 ≫ B0 (dock anchored 0.99/1.22/1.32/66.7 m; D 0.72/2.85/3.37/9624). Docking <0.5 m: **0% all arms** at plan-faithful acquisition — the deceleration approach (v2) is REQUIRED for the spec. **NEW DISCLOSURE: long-transit ANEES 159–229 all arms — the M-FAB calibration gate does not transfer to 450 s transits** (bias RW growth exceeds declared Q) | d7_scorecard.json |
+| D7 / B1 | strongest measured centralized reference | — | **B1 = the record's own zero-latency all-to-all limit**: 6% gap at the S1 horizon (0.172 vs 0.183 m, b1_limit_mfab.json); the gap widens on 450 s transits (dock 0.99 vs 1.22 m, D 0.72 vs 2.85, drift NOT improved — scorecard row). One recorded re-architected centralized replay (B1-lite): 0.41 m, 2.2× worse; the joint-EKF design run (0.43 m) is kept as a design record (b1_joint.py, un-persisted). A fundamentally better centralized estimator beyond those attempted is not excluded — "reference", not "oracle". B3: design-incomplete after 6 structural iterations (WIP, excluded; bring-up log = discussion material) | b1_limit_mfab.json, b1_true.json, b1_joint.py, b3_relpose.py |
+| D7 scorecard | 50-transit BHT table | — | **ordering on D and fleet-mean**: B1lim > paper > B2 ≫ B0 (fleet mean 0.76/1.57/2.13/66.7 m; D 0.72/2.85/3.37/9624). Anchored-agent column: 0.99/1.22/1.32/1.25 m — B0's anchored agent is beacon-corrected at dock and masks its drift, so the ordering claim rests on D and fleet-mean. Docking <0.5 m: **0% all arms** at plan-faithful acquisition — a change of approach is necessary (even the zero-latency limit misses the spec); the deceleration approach (v2) is the planned remedy, sufficiency untested. **NEW DISCLOSURE: long-transit ANEES 159–229 all arms — the M-FAB calibration gate does not transfer to 450 s transits** (bias RW growth exceeds declared Q) | d7_scorecard.json |
 | E10 / D8 | numerics invariance | exponent CIs disjoint across Δt / h | **PASSED both plants** (Δt 10× range: CIs share [1.185, 1.256]; h: identical to 3 decimals, convergence verified genuine by truth-diff 1.35 mm, recorded in d8_h_sweep.json `_truth_diff_check`) | e10_dt_sweep.json, d8_h_sweep.json |
 
 **Epistemic spine (three measured exponents, three objects, never conflated):**
@@ -58,7 +60,7 @@ resolved only noise-off).
 | F5 symmetry (two panels, never mixed) | tier1_sheaf/results/f5_symmetry.png/pdf | done |
 | F8 contraction | tier1_sheaf/results/f8_contraction.png/pdf | done |
 | F3 gauge spectrum (executed earlier) | tier1_sheaf/results/e1_gauge.png | done |
-| Baselines table | gallery §4 / baselines.json | done (B1-true/B3 pending D7) |
+| Baselines table | gallery §4 / baselines.json + d7_scorecard.json | done (B1 = zero-latency limit, measured; B3 WIP-excluded) |
 | Gallery (all of the above, hedged captions) | claude.ai artifact c684d82f… | published |
 
 ## 3. Reproducibility manifest (cell → driver → data)
@@ -86,9 +88,10 @@ P-class asserts (realized age ≡ τ) that gate off only in the declared robust 
 
 - **Author decisions pending:** Q3 (α_k table → C9a and m∈{3,4} E3a extension),
   Q11 ([PUB] factual corrections), Q15 (E4/E5 landing site), QD-gate ratifications.
-- **D7 full scorecard** (50 transits, docking metrics, true B1 joint EKF, B3
-  relative-pose DInEKF) — design notes recorded from the B1-lite negative result
-  (naive centralization loses 2.2× to the record) and the B3 architecture sketch.
+- **D7 remainder**: the baseline scorecard is EXECUTED (rows above); still open:
+  the A2-inclusive rule head-to-head in the transit setting, and B3's completion
+  (needs its own Kalman-weighted load-state filter — six-iteration bring-up log
+  recorded; the unlocalized ~1.5 m systematic in the fix derivation).
 - **Hero v2:** decelerating approach (extends beacon window physically),
   jitter/drop comms in the Drake fabric (Tier-1 harness already has them),
   tension-colored cables, online λ₂ panel.
@@ -106,9 +109,15 @@ conjecture for the closed-loop floor is falsified at these scales on both plants
 the measured slope (≈ 1.05–1.13, cross-tier equivalent) is reported as measured,
 with the D₀/mixture caveat (plan R3), and asserted as no law. Transport
 compensation is load-bearing on Drake where correctness is measured; the ablation
-ordering inverts on Tier-1, and definitive rule ranking awaits the pending D7
-scorecard. Agreement alone is purchasable by groupthink and is never a virtue
-metric. Every pre-registered negative result is controlled and, where its
+ordering inverts on Tier-1; the executed D7 baseline scorecard confirms the
+ordering on transits (on D and fleet-mean), with the A2-inclusive transit
+head-to-head still un-run. Two adverse D7 facts, stated plainly: the docking spec
+is unmet by every arm at plan-faithful acquisition — including the zero-latency
+limit — so the approach geometry, not the estimator, is the binding constraint
+(deceleration approach necessary; sufficiency untested); and the M-FAB
+consistency gate closes only at the S1 horizon and does not transfer to 450 s
+transits (ANEES 159–229). Agreement alone is purchasable by groupthink and is
+never a virtue metric. Every pre-registered negative result is controlled and, where its
 localization ladder has completed, localized (the ×5 coefficient disagreement has
 one rung run; C10's high-τ structure is exploratory, not pre-registered). No
 claim needs retraction — captions were CONJ from the start.

@@ -1,0 +1,29 @@
+{
+ "config": "M-FAB horizon (Tend=130, t_on=30, eval [114,130]); tau=0.01; topology=complete; single anchor",
+ "note": "B1-limit = the record architecture at zero latency, all-to-all. Claims scoped to THIS horizon; on the 450 s dogleg the gap is 19% with drift not improved (d7_scorecard.json).",
+ "err": 0.1720088284653596,
+ "record_err_same_horizon": 0.1831,
+ "per_seed": [
+  {
+   "seed": 0,
+   "err": 0.17767645179974223,
+   "anees": 4.486817838015473,
+   "D": 0.05919871177625407,
+   "drift": 0.6381722922834409
+  },
+  {
+   "seed": 1,
+   "err": 0.15293438721268457,
+   "anees": 3.3977256401949787,
+   "D": 0.05018707155812617,
+   "drift": 0.738905754196747
+  },
+  {
+   "seed": 2,
+   "err": 0.18541564638365196,
+   "anees": 4.382171136035053,
+   "D": 0.05634692689668765,
+   "drift": 0.6292274499748475
+  }
+ ]
+}
