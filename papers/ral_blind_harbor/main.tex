@@ -1,7 +1,11 @@
 % RA-L Blind Harbor companion — manuscript draft skeleton (assembled from
 % docs/ral_package.md; every number traceable via campaign_replay.py)
 \documentclass[letterpaper, 10pt, journal]{IEEEtran}
-\usepackage{graphicx, amsmath, amssymb, booktabs}
+\usepackage{graphicx, amsmath, amssymb, booktabs, amsthm}
+\newtheorem{theorem}{Theorem}\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}\newtheorem{definition}{Definition}
+\newcommand{\provtag}{\textsc{[proven]}}
+\newcommand{\conjtag}{\textsc{[conjectural]}}
 \graphicspath{{figures/}}
 
 \title{The Price of Staleness: Distributed Invariant Estimation for\\
@@ -115,6 +119,164 @@ $\sim$3--4$\times$. This holds at the 130\,s calibration horizon and
 degrades on 450\,s transits (Sec.~\ref{sec:results}); every ANEES figure in
 this paper carries its horizon.
 
+
+
+\section{Theoretical foundations (self-contained)}\label{sec:theory}
+This section states, in full, the theory this paper tests; proofs are as in the
+companion, reproduced or sketched here so the paper stands alone. Statements
+carry their epistemic tags verbatim: \provtag{} marks proven claims,
+\conjtag{} marks conjectural ones --- the separation is load-bearing for
+everything that follows. Throughout, $SE(2) \ni g = (R(\theta), p)$,
+$\mathfrak{se}(2) \ni \xi = (v_x, v_y, \eta)$, $\mathcal{G}$ a connected
+communication graph on the $N$ agents.
+
+\begin{lemma}[Constraint trivialization]\label{lem:m}
+Let $g_L \in SE(2)$ be the load pose and $s_j = (\sigma^{(j)},
+\sigma^{(j)}_j)$ agent $j$'s shape pair (cable direction in the load frame and
+in its own frame). Then agent $j$'s world pose is
+\begin{equation}
+g_j = g_L\, m(s_j), \qquad
+m(\sigma, \sigma_i) = \bigl(R(\sigma - \sigma_i),\; l(\cos\sigma,
+\sin\sigma)\bigr),
+\label{eq:mfull}
+\end{equation}
+and \eqref{eq:mfull} reproduces the cable-length constraint, the world cable
+angle $\varphi = \theta + \sigma$, and the heading relation
+$\theta_j = \theta + \sigma^{(j)} - \sigma^{(j)}_j$ identically. \provtag
+\end{lemma}
+\begin{proof}
+Direct computation: $g_L m$ has translation $p_L + R(\theta)\, l(\cos\sigma,
+\sin\sigma) = p_L + l(\cos(\theta{+}\sigma), \sin(\theta{+}\sigma))$, whence
+$\|p_j - p_L\| = l$ and $\varphi = \theta + \sigma$; its rotation is
+$R(\theta + \sigma - \sigma_i)$.
+\end{proof}
+
+\begin{lemma}[Edge maps are shape-only and locally computable]\label{lem:edge}
+For agents $i, j$ attached at the common point, $g_i^{-1} g_j =
+m(s_i)^{-1} m(s_j)$, independent of $g_L$; moreover each agent can express the
+load pose from its own data alone, $g_L = g_j\, m(s_j)^{-1}$. \provtag
+\end{lemma}
+This is the physical fact that makes a \emph{constraint-induced} sheaf
+possible: the maps identifying neighboring belief spaces are not exogenous
+calibration data --- they are functions of the constraint geometry, computable
+from local measurements.
+
+\begin{definition}[Estimation sheaf; sheaf Laplacian]\label{def:sheafF}
+The estimation sheaf $\mathcal{F}_\Sigma$ over $\mathcal{G}$ has stalks
+$\mathcal{F}_\Sigma(j) = \mathfrak{se}(2) \oplus \mathbb{R}^2$ (load error
+$\oplus$ shape error), edge stalks $\mathfrak{se}(2)$, and restriction maps
+$\rho_{j \triangleleft e} = \mathrm{Ad}_{m(s_j)} \circ \pi_L$ ($\pi_L$ the
+load-block projection). With coboundary $(\delta x)_e = \rho_{i\triangleleft e}
+x_i - \rho_{j\triangleleft e} x_j$ and edge weights $W_e = w_e I_3$,
+$w_e = (\iota_i^{-1} + \iota_j^{-1})^{-1}$ (series information,
+$\iota_j \propto \cos^2\!\sigma^{(j)}_j \sec^4\!\sigma^{(j)}$), the weighted
+sheaf Laplacian is $L_{\mathcal{F}}(s) = \delta^\top W \delta \succeq 0$.
+\end{definition}
+At a common instant the restriction maps compose exactly around every cycle
+($\prod_c m^{-1}_{i_k} m_{i_{k+1}} = e$): the \emph{instantaneous} sheaf is
+flat, though never unitarily so ($\mathrm{Ad}_{m}$ is non-orthogonal), which
+is why the spectrum of $L_\mathcal{F}$ genuinely depends on the shapes.
+\provtag
+
+\begin{theorem}[Exact residual unobservability $=$ one global gauge]
+\label{thm:gaugeF}
+For connected $\mathcal{G}$, restricted to the load blocks,
+\[
+\ker L_{\mathcal{F}} = \bigl\{ (\mathrm{Ad}^{-1}_{m(s_j)} c)_{j \in V} : c \in
+\mathfrak{se}(2) \bigr\} \cong \mathfrak{se}(2) = H^0(\mathcal{F}_\Sigma):
+\]
+the harmonic sections are exactly one common load-frame perturbation seen from
+each body frame. The decentralized problem is observable \emph{exactly modulo
+one global $SE(2)$ gauge} --- no less (the gauge is intrinsic to GNSS denial),
+no more (nothing else survives fusion plus local sensing). \provtag
+\end{theorem}
+\begin{proof}
+$x \in \ker L_\mathcal{F} \iff \delta x = 0 \iff \mathrm{Ad}_{m(s_i)} x_i =
+\mathrm{Ad}_{m(s_j)} x_j$ on every edge; connectedness propagates the common
+value $c$; all $\mathrm{Ad}$ are invertible.
+\end{proof}
+
+\begin{corollary}[Pinning]\label{cor:pinF}
+One agent with an absolute pose channel gives its stalk a full-rank vertex
+potential and $\ker \to 0$: a single anchor removes the gauge, and
+$\lambda_{\min}$ becomes the relevant rate. \provtag
+\end{corollary}
+
+\begin{corollary}[Network inheritance of conditioning singularities]
+\label{cor:inheritF}
+$w_e \to 0$ as either endpoint approaches broadside
+($\cos\sigma^{(j)}_j \to 0$), so $\lambda_2(L_\mathcal{F}) \to 0$: per-agent
+singular circles reappear as network-level estimation collapse. \provtag{}
+(monotone rate: \conjtag)
+\end{corollary}
+
+\begin{theorem}[Frozen-linearization contraction]\label{thm:contractF}
+With stacked log/shape errors $e \in \mathbb{R}^{5N}$, frozen error generator
+$A(s)$, innovation rate $\mu(s) > 0$ on the tension-observable directions, and
+$c_A(s) = \|\mathrm{sym}\, A(s)\|$: on the $L_\mathcal{F}$-orthogonal
+complement of the gauge,
+\[
+\tfrac{\mathrm{d}}{\mathrm{d}t} \tfrac{1}{2}\|e_\perp\|^2 \le
+-\bigl(\mu(s) + \kappa\,\lambda_2(L_\mathcal{F}(s)) - c_A(s)\bigr)
+\|e_\perp\|^2,
+\]
+so $\inf_t(\mu + \kappa\lambda_2 - c_A) > 0$ gives uniform exponential
+contraction of everything except the global gauge. \provtag{} (LTV level,
+under the stated uniform bounds; full nonlinear statement: \conjtag)
+\end{theorem}
+
+\begin{lemma}[Group-commutator defect]\label{lem:bchF}
+For $X, Y \in \mathfrak{se}(2)$:
+$\log(e^{\varepsilon X} e^{\varepsilon Y} e^{-\varepsilon X}
+e^{-\varepsilon Y}) = \varepsilon^2 [X, Y] + O(\varepsilon^3)$. \provtag
+\end{lemma}
+
+\begin{theorem}[Latency--curvature floor]\label{thm:floorF}
+Let $c = (j_1 \cdots j_m)$ be a cycle of $\mathcal{G}$, all lags $\tau$,
+agents in persistent motion with common load twist $\xi \ne 0$, and
+\[
+C_j(s_j; \xi) = \mathrm{Ad}_{m(s_j)}\, \mathrm{ad}_\xi\,
+\mathrm{Ad}^{-1}_{m(s_j)}, \qquad
+\mathrm{ad}_{(v, 0, \eta)} = \begin{pmatrix} 0 & -\eta & 0\\ \eta & 0 & -v\\
+0 & 0 & 0\end{pmatrix}.
+\]
+The composed lagged edge maps around $c$ equal the holonomy of the linearized
+constrained flow along the associated loop, and to leading order
+\[
+\log \mathrm{Hol}(\gamma_c) = \tau^2 \sum_k \alpha_k\,
+[C_{j_k}, C_{j_{k+1}}] + O(\tau^3),
+\]
+with combinatorial $\alpha_k$. Consequently the lagged sheaf is non-flat
+whenever the bracket sum is nonzero, and no exactly consistent decentralized
+assignment exists: for any gauge choice the weighted disagreement obeys the
+frustration bound
+$\min_{\mathrm{gauge}} \sum_{e \in c} W_e \|(\delta_\tau x)_e\|^2 \ge \eta_c
+\|x\|^2$ with $\eta_c \asymp \tfrac{1}{m} \|\log\mathrm{Hol}(\gamma_c)\|^2$.
+\provtag{} (leading order, deterministic; sharp constants and the stochastic
+steady-state floor: \conjtag)
+\end{theorem}
+\begin{proof}[Proof sketch]
+Freeze generators over one lag; each edge comparison composes
+$e^{\tau C_j}$-type propagators with the instantaneously exact
+$m$-transports; telescoping kills the flat part and Lemma~\ref{lem:bchF}
+isolates the $\tau^2$ commutators; Ambrose--Singer identifies the all-orders
+object.
+\end{proof}
+
+\begin{corollary}[Symmetry protection]\label{cor:symF}
+Identical shape pairs on the cycle give $C_{j_k} \equiv C_{j_{k'}}$ and the
+$\tau^2$ term cancels identically: symmetric formations are protected to
+leading order, with floor $O(\tau^3)$; generic shapes give a strictly positive
+coefficient. \provtag
+\end{corollary}
+
+Three switch-off limits each kill the floor --- $\tau \to 0$ (instantaneous
+flatness), $\xi = 0$ (no motion), and coincident shapes
+(Cor.~\ref{cor:symF}) --- and each is a measurable arm in
+Sec.~\ref{sec:results}. The \conjtag{} extension --- that the noisy
+closed-loop steady-state disagreement inherits the $\tau^2$ order --- is
+precisely what our experiments falsify at realistic noise, while every
+\provtag{} statement above survives, several at coefficient precision.
 
 \section{The DIEKF-$\Sigma$ method in full}\label{sec:method}
 

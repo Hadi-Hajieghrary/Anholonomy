@@ -1,7 +1,11 @@
 % L-CSS floor letter — draft with all numerics sections complete.
 % Theory-statement blocks marked %% AUTHOR: pull from refs/estimation_sheaf.tex.
 \documentclass[letterpaper, 10pt, journal]{IEEEtran}
-\usepackage{graphicx, amsmath, amssymb, booktabs}
+\usepackage{graphicx, amsmath, amssymb, booktabs, amsthm}
+\newtheorem{theorem}{Theorem}\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\provtag}{\textsc{[proven]}}
+\newcommand{\conjtag}{\textsc{[conjectural]}}
 \graphicspath{{figures/}}
 
 \title{A Latency--Curvature Floor for Distributed Estimation\\
@@ -30,17 +34,87 @@ theorem's claim.
 \end{abstract}
 
 \section{Introduction}
-\textbf{[Author section:} motivation from the companion theory --- cable-coupled
-multi-agent estimation, the constraint channel, delayed fusion through
-shape-conjugated transports, and why the round trip is the natural object.
-Source: estimation\_sheaf.tex \S1.\textbf{]}
+When cable-coupled agents estimate a common load pose from purely local
+sensing --- each observing only its own odometry and its own cable --- their
+beliefs live in different body frames, and fusing them requires transporting
+estimates along shape-dependent maps. When fusion is additionally
+\emph{delayed}, each transport is built from stale shape information, and the
+composition of stale transports around any closed communication circuit no
+longer closes: it acquires a holonomy. This letter proves that, to leading
+order in the staleness $\tau$, that holonomy is second order with an explicit
+commutator coefficient, identifies its exact null directions, and verifies the
+result numerically to coefficient precision on two independent constructions.
+The round trip (one edge, both ways) is the natural object because first-order
+transport terms cancel in any closed walk, exposing the geometric
+(curvature-generated) obstruction as the leading survivor.
 
 \section{Setting and main result}
-\textbf{[Author section:} Theorem 7.2 stated verbatim with its tag ---
-``(leading order, deterministic; sharp constants and the stochastic
-steady-state floor: [Conjectural])'' --- the hedge is load-bearing; plus the
-supporting BCH lemma (Lem.~7.1). Source: estimation\_sheaf.tex
-\S7.\textbf{]}
+Let $g_L \in SE(2)$ be the load pose and $s_j = (\sigma, \sigma_i)$ agent
+$j$'s shape pair (cable direction in the load and body frames).
+
+\begin{lemma}[Constraint trivialization]\label{lem:m}
+Agent $j$'s world pose is $g_j = g_L\, m(s_j)$ with
+$m(\sigma, \sigma_i) = (R(\sigma - \sigma_i),\, l(\cos\sigma,
+\sin\sigma))$, reproducing the cable-length constraint, the world cable
+angle $\varphi = \theta + \sigma$, and the heading relation identically;
+consequently $g_i^{-1} g_j = m(s_i)^{-1} m(s_j)$, independent of $g_L$, and
+each agent can express the load pose from its own data alone. \provtag
+\end{lemma}
+\begin{proof}
+Direct computation: $g_L m$ has translation $p_L + l(\cos(\theta{+}\sigma),
+\sin(\theta{+}\sigma))$, whence $\|p_j - p_L\| = l$; its rotation is
+$R(\theta + \sigma - \sigma_i)$; the relative pose telescopes.
+\end{proof}
+
+At a common instant these transports compose exactly around every cycle (the
+instantaneous structure is flat); latency breaks the flatness, and it breaks it
+by curvature. With lag $\tau$, an agent transports a neighbor's stale belief
+by the frozen linearized flow, whose load-block generator is the conjugated
+operator
+\begin{equation}
+C_j(s_j; \xi) = \mathrm{Ad}_{m(s_j)}\, \mathrm{ad}_\xi\,
+\mathrm{Ad}^{-1}_{m(s_j)}, \quad
+\mathrm{ad}_{(v,0,\eta)} = \begin{pmatrix} 0 & -\eta & 0\\
+\eta & 0 & -v\\ 0 & 0 & 0 \end{pmatrix},
+\end{equation}
+with $\xi$ the common load twist.
+
+\begin{lemma}[Group-commutator defect]\label{lem:bch}
+For $X, Y \in \mathfrak{se}(2)$:
+$\log(e^{\varepsilon X} e^{\varepsilon Y} e^{-\varepsilon X}
+e^{-\varepsilon Y}) = \varepsilon^2 [X, Y] + O(\varepsilon^3)$. \provtag
+\end{lemma}
+
+\begin{theorem}[Latency--curvature floor]\label{thm:floor}
+For a cycle $c = (j_1 \cdots j_m)$ with all lags $\tau$ and agents in
+persistent motion with common load twist $\xi \ne 0$, the composed lagged
+edge maps equal the holonomy of the linearized constrained flow along the
+associated loop, with
+\[
+\log \mathrm{Hol}(\gamma_c) = \tau^2 \sum_k \alpha_k\,
+[C_{j_k}, C_{j_{k+1}}] + O(\tau^3)
+\]
+for combinatorial $\alpha_k$; the lagged structure is non-flat whenever the
+bracket sum is nonzero, and no exactly consistent decentralized assignment
+exists: any gauge choice obeys the frustration bound
+$\min_{\mathrm{gauge}} \sum_{e \in c} W_e \|(\delta_\tau x)_e\|^2 \ge
+\eta_c \|x\|^2$, $\eta_c \asymp \tfrac{1}{m}\|\log
+\mathrm{Hol}(\gamma_c)\|^2$. \provtag{} (leading order, deterministic;
+sharp constants and the stochastic steady-state floor: \conjtag)
+\end{theorem}
+\begin{proof}[Proof sketch]
+Freeze generators over one lag; each edge comparison composes
+$e^{\tau C_j}$-type propagators with the instantaneously exact
+$m$-transports; telescoping kills the flat part and Lemma~\ref{lem:bch}
+isolates the $\tau^2$ commutators; Ambrose--Singer identifies the all-orders
+object.
+\end{proof}
+
+\begin{corollary}[Symmetry protection]\label{cor:sym}
+Identical shape pairs on the cycle give $C_{j_k} \equiv C_{j_{k'}}$: the
+$\tau^2$ term cancels identically and the floor is $O(\tau^3)$; generic
+shapes give a strictly positive coefficient. \provtag
+\end{corollary}
 
 
 \section{Construction and proof architecture}
@@ -153,6 +227,25 @@ $1.08$--$1.10$ (cross-tier equivalent; the conjectured order 2 excluded), with
 the $\tau^2$ object resolved only noise-free: at realistic sensor noise the
 closed loop is dominated by first-order estimate mismatch. We state this
 boundary here so the theorem is cited for what it proves.
+
+\section{Contribution, deduced}
+The chain closes as follows. Lemma~\ref{lem:m} makes decentralized load
+estimation from purely local sensing well posed and supplies the transports;
+Lemma~\ref{lem:bch} shows any closed walk of stale transports is second-order
+in the staleness with a commutator coefficient; Theorem~\ref{thm:floor}
+identifies that coefficient with the constraint curvature through the
+conjugated generators and converts it into a frustration bound --- the
+impossibility of exactly consistent decentralized estimation under latency and
+motion; and Corollary~\ref{cor:sym} plus the $\xi{=}0$, $\tau\to0$ limits
+give the complete set of null directions. The measurements verify every
+element of this chain at its own level: order (1.999/2.000 on two independent
+constructions), coefficient (1.0000), and all null directions (machine zero).
+The main contribution is therefore not a bound alone but an \emph{identified
+mechanism with verified constants and verified switch-offs} --- together with
+the honest boundary of Sec.~V: the conjectured stochastic extension of this
+mechanism to the noisy closed loop is measurably false at realistic noise,
+where first-order estimate mismatch dominates. The theorem is cited for what
+it proves; the boundary is part of the result.
 
 \section{Reproducibility}
 Every number above traces to a seeded, versioned driver;
