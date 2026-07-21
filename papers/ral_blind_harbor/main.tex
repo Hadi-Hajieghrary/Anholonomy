@@ -2,7 +2,7 @@
 % docs/ral_package.md; every number traceable via campaign_replay.py)
 \documentclass[letterpaper, 10pt, journal]{IEEEtran}
 \usepackage{graphicx, amsmath, amssymb, booktabs}
-\graphicspath{{../../tier2_drake/results/s1/}{../../tier1_sheaf/results/}}
+\graphicspath{{figures/}}
 
 \title{The Price of Staleness: Distributed Invariant Estimation for\\
 GNSS-Denied Multi-Vessel Cable Towing}
@@ -135,13 +135,25 @@ boundary.
 \subsection{Gauge pinning (Cor.~5.2 in closed loop)}
 Through 400\,s of GNSS denial the five per-agent estimates drift as one rigid
 gauge orbit --- kernel-projected error grows unbounded while the complement
-stays two orders smaller (Thm~5.1's structure, visible in the hero transit's
-live panels). At beacon acquisition the disagreement \emph{spikes}: the
-anchored agent snaps toward truth while its neighbors still carry the drifted
-gauge, and the pin then propagates at the network diffusion rate
+stays two orders smaller (Thm~5.1's structure; Fig.~\ref{fig:montage} and
+supplementary videos S1--S2). At beacon acquisition the disagreement
+\emph{spikes}: the anchored agent snaps toward truth while its neighbors still
+carry the drifted gauge, and the pin propagates at the network diffusion rate
 ($\tau_{\mathrm{net}} \approx 21$\,s for one 5\,Hz anchor on $C_5$). The
-docking scorecard reports anchored, fleet-mean, and fleet-max rows without
-selection.
+docking scorecard (Table~\ref{tab:scorecard}) reports anchored, fleet-mean,
+and fleet-max rows without selection.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{hero_montage.png}
+  \caption{Three phases of the GNSS-denied transit (supplementary video S2).
+  Left: gauge free --- the five ghost caissons (each agent's own load estimate)
+  drift \emph{coherently}, overlapping each other while offset from truth.
+  Middle: the beacon pins one agent; the fleet is mid-convergence. Right:
+  converged through the turn. Single illustrative run, median-$D_{ss}$ seed by
+  the documented selection rule.}
+  \label{fig:montage}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -206,16 +218,66 @@ B0 (dead-reckon) & 1.25 & 66.7 & 134.1 & 9624 & 43.8 \\
 \end{figure}
 
 \subsection{Symmetry: protection lives on the amplitude object}
-% F5 (two panels, never mixed) + C9c trip on both tiers + the 31x/2x contrast.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{f5_symmetry.pdf}
+  \caption{Two objects, two panels, never mixed. (a)~The amplitude departure
+  from the symmetric class is first-order in $\varepsilon$ (measured 1.006,
+  base commutator exactly zero). (b)~The closed-loop floor excess: the
+  seed-paired estimator gives slope 1.58 [1.44, 1.84] at every $\tau$ ---
+  excluding both the conjectured 2 and 1; segment slopes rise 1.2\,$\to$\,2.1
+  up the ladder, consistent with a linear-plus-quadratic mixture that the
+  registered single-power model mis-specifies.}
+  \label{fig:f5}
+\end{figure}
+The symmetric class suppresses the \emph{amplitude} object strongly
+($31\times$ at Drake's achieved-$\varepsilon$; exactly on Tier-1) but the
+closed-loop floor only weakly ($\sim$2--3$\times$ on both plants, ideal or
+robust): the pre-registered $\geq 10\times$ robust-suppression falsifier
+trips on both tiers, because closed-loop disagreement is mismatch-dominated,
+not holonomy-dominated. The corollary was never wrong; it was being tested
+against the wrong quantity.
 
 \subsection{Cross-tier coefficients and the validity domain}
-% The x5 reference-matched ratio; Q_XI-off localization (baseline agrees to
-% 12%); inertia-free shape response; Drake realized shapes exit the reduced
-% model's stable domain (validity-domain finding).
+Reference-matched coefficient comparison gives a $5.04\,[3.97, 6.19]$ ratio,
+outside the pre-registered equivalence band --- reported as a plant-side
+disagreement and localized: with the reduced plant's declared process noise
+switched off, the straight-tow baselines agree to 12\%, leaving a maneuvering
+excess attributed to the inertia-free shape response. The multibody plant's
+realized maneuvering shapes exit the reduced model's stable domain entirely
+(a measured validity-domain boundary): exponents and baselines transfer across
+plants; maneuvering amplitudes do not.
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{d9_topology.pdf}
+  \caption{Connectivity buys agreement, not anchoring. The pre-anchor floor
+  improves with $\lambda_2$ (a); single-anchor pinning is anchor-rate-limited
+  (b, Spearman $+0.04$); re-agreement around the pin \emph{anti}-orders with
+  connectivity (c, $-0.51\,[-0.65, -0.36]$). With the in-domain contraction
+  claim verified (Fig.~\ref{fig:f8}), this is the pre-registered ES-01 finding
+  path, reported as such.}
+  \label{fig:d9}
+\end{figure}
 
 \subsection{Numerics defense}
-% E10 (exponent Delta-t-invariant over 10x) and D8 (h-invariant; convergence
-% verified genuine by direct truth-trajectory differencing, 1.35 mm / 30 s).
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{f8_contraction.pdf}
+  \caption{Contraction in its own domain (frozen, unanchored): rate versus
+  $\kappa\lambda_2$ across two topologies, slope 1.40 (falsifier $< 0.5$);
+  $\mu$ calibrated at $\kappa = 0$, so the identity line is anchored, not
+  predicted. The log-linearity remainder vanishes \emph{faster} than the
+  registered second order (2.48 [2.32, 2.65]; falsifier band excluded on the
+  favorable side, reported as tripped with the corrected order).}
+  \label{fig:f8}
+\end{figure}
+The floor exponent is invariant across a $10\times$ integrator-step range on
+the reduced plant (CIs share $[1.185, 1.256]$) and across $h \in \{0.5, 1,
+2\}$\,ms on the multibody plant (identical to three decimals; convergence
+verified genuine by direct truth-trajectory differencing, 1.35\,mm over
+30\,s). Solver artifacts do not alias into any exponent this paper reports.
 
 \section{Discussion}
 \paragraph{The epistemic ladder as data.} The campaign's central result is a
@@ -280,6 +342,17 @@ match the committed records exactly (Tier-1 to $10^{-9}$; Drake to $10^{-6}$),
 and \texttt{--run CELL} regenerates any full campaign.
 
 \section{Conclusion}
+On two independent plants sharing one estimator, the proven leading-order
+holonomy verifies to coefficient precision; the conjectured second-order
+closed-loop floor is falsified coherently, with the first-order
+estimate-mismatch channel dominating at realistic noise; and the sheaf-induced
+transport is the load-bearing element of the design --- ablations, baselines,
+and the strongest measured centralized reference all lose to it or barely
+improve on it. The campaign's negative results are pre-registered,
+controlled, and localized; its remaining limits (docking approach, long-horizon
+calibration, guard lag, slack cables) are stated as measured boundaries with
+recorded remedies. All data, drivers, figures, and videos are versioned and
+exactly replayable.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
