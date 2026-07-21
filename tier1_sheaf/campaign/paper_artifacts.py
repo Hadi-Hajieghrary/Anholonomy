@@ -360,7 +360,7 @@ def fig_domain():
                 fontsize=7.5, color=FAIL_C)
     ax.set_xlabel("$\\tau$"); ax.set_ylabel("$\\Vert\\log\\mathrm{Hol}\\Vert$")
     ax.set_title("outside the leading-order domain")
-    ax.legend(loc="lower right")
+    ax.legend(loc="upper left")
     json.dump({"shapes": [si, sj], "knee_tau_10pct": knee,
                "commutator_norm": float(K)},
               open(os.path.join(OUT, "domain_boundary_meta.json"), "w"), indent=1)
@@ -508,7 +508,7 @@ def fig_topology():
                    key=lambda kv: kv[1]["lambda2"])
     names = [k.replace("_", " $N{=}$") for k, _ in items]
     lam = [v["lambda2"] for _, v in items]
-    fig, ax = plt.subplots(figsize=(4.6, 2.6))
+    fig, ax = plt.subplots(figsize=(6.4, 2.7))
     x = np.arange(len(items))
     ax.bar(x - 0.19, [v["D02"] for _, v in items], width=0.38,
            color="#1565c0", label="$\\tau=0.2$")
@@ -517,11 +517,12 @@ def fig_topology():
     ax.set_yscale("log")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{n}\n$\\lambda_2$={l:.2f}" for n, l in zip(names, lam)],
-                       fontsize=6.2)
+                       fontsize=5.6, rotation=45, ha="right")
     ax.set_ylabel("$D_{ss}$")
     ax.legend()
     ax.set_title("C10 (exploratory): connectivity suppresses the floor at "
-                 "moderate $\\tau$; benefit collapses at high $\\tau$")
+                 "moderate $\\tau$;\nbenefit collapses at high $\\tau$",
+                 fontsize=8)
     save(fig, "tcns_topology")
 
 

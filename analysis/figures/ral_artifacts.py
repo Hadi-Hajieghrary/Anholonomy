@@ -201,7 +201,9 @@ def fig_hero_series():
 def fig_agent_errors():
     z = np.load(os.path.join(S1, "hero_series.npz"))
     ts, errs = z["ts"], z["errs"]
-    anch = int(np.argmin(errs[-1]))          # beacon agent (agent 0 by build)
+    # the beacon is wired to agent 0 BY BUILD (s1.py: i == 0); an argmin
+    # heuristic misidentifies it from end-sample noise [audit catch]
+    anch = 0
     fig, ax = plt.subplots(figsize=(4.2, 2.7))
     for i in range(errs.shape[1]):
         if i == anch:
@@ -362,7 +364,8 @@ def fig_forest():
 # ---------------------------------------------------------------------------
 def fig_robustness():
     d = json.load(open(os.path.join(S1, "d10b_loss.json")))
-    fig, (a, b) = plt.subplots(1, 2, figsize=(7.0, 2.6))
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.4, 2.6),
+                               gridspec_kw={"wspace": 0.35})
     for J, col, lab in ((0, "#1565c0", "drops only (J=0)"),
                         (8, "#7b1fa2", "drops + jitter (J=8)")):
         ps, mean, sd = [], [], []
@@ -373,9 +376,8 @@ def fig_robustness():
         a.errorbar(ps, mean, yerr=sd, fmt="o-", color=col, capsize=3, label=lab)
     a.set_xlabel("packet-drop probability $p$")
     a.set_ylabel("floor $D_{ss}$")
-    a.set_title("(a) D10(b): graceful — +13% @ $p$=0.1, +45% @ $p$=0.3;\n"
-                "anchored ANEES in-gate at $p$=0.3 (4.23, S1 horizon)",
-                fontsize=8)
+    a.set_title("(a) D10(b): graceful — +13% @ $p$=0.1,\n+45% @ $p$=0.3; "
+                "ANEES in-gate (4.23, 130 s)", fontsize=7.5)
     a.legend(fontsize=7)
     g = json.load(open(os.path.join(S1, "d10c_guard.json")))
     env = g["envelope_probe"]
@@ -389,8 +391,7 @@ def fig_robustness():
     b.set_xticklabels([f"{float(f):.0f} N gust" for f in forces])
     b.set_ylabel("closest broadside approach")
     b.set_title("(b) D10(c): $\\hat\\sigma_i$ LAGS true broadside —\nguard "
-                "unexercised in the reachable envelope (ON$\\,\\equiv\\,$OFF)",
-                fontsize=8)
+                "unexercised (ON$\\,\\equiv\\,$OFF)", fontsize=7.5)
     b.legend(fontsize=7)
     save(fig, "ral_robustness")
 
