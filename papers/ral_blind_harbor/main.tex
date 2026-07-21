@@ -115,6 +115,167 @@ $\sim$3--4$\times$. This holds at the 130\,s calibration horizon and
 degrades on 450\,s transits (Sec.~\ref{sec:results}); every ANEES figure in
 this paper carries its horizon.
 
+
+\section{The DIEKF-$\Sigma$ method in full}\label{sec:method}
+
+\subsection{Geometry, trivialization, and state}
+Work on $SE(2)$ with elements $g = (R(\theta), p)$, exponential
+$\mathrm{Exp}(\xi) = (R(\omega),\, V(\omega)v)$ for $\xi = (v, \omega)$ with
+$V(\omega) = \tfrac{1}{\omega}\bigl[\begin{smallmatrix}\sin\omega &
+\cos\omega - 1\\ 1-\cos\omega & \sin\omega\end{smallmatrix}\bigr]$, and adjoint
+\begin{equation}
+\mathrm{Ad}_{(R,t)} \;=\; \begin{bmatrix} R & Jt \\ 0 & 1 \end{bmatrix},
+\qquad Jt = (t_y, -t_x)^\top .
+\end{equation}
+The per-agent \emph{channel shape} is $s_j = (\sigma, \sigma_i)$: the cable
+direction in the load frame and in the vessel frame. The taut cable of length
+$l$ trivializes the vessel pose through
+\begin{equation}\label{eq:triv}
+m(\sigma, \sigma_i) \;=\; \bigl(R(\sigma - \sigma_i),\;
+l(\cos\sigma, \sin\sigma)\bigr) \in SE(2),
+\end{equation}
+so that $g_{\mathrm{vessel}} = g_L\, m(s)$ and the edge maps
+$g_i^{-1} g_j = m_i^{-1} m_j$ are independent of the load pose $g_L$
+(Lemmas~3.1--3.2 of the companion) --- the structural fact that makes
+per-agent load estimation from purely local sensing well posed, and the origin
+of the three-dimensional gauge kernel (Thm~5.1, companion, proven).
+
+Each agent carries: the load-pose estimate $\hat G \in SE(2)$; the shape
+estimate $\hat s = (\hat\sigma, \hat\sigma_i)$; the gyro-integrated own heading
+$\hat\theta_a$; sensor-bias states (surge scale $\hat\beta$, gyro bias
+$\hat b_g$; a velocity-offset state $\hat m_v$ exists in the implementation but
+is disabled in the record configuration --- its three measured failure modes
+are documented in the released code); the previous composite twist
+$\hat\xi_{\mathrm{prev}}$; a Friedland-type drift trim $\hat m_\xi$; and an
+$8{\times}8$ error covariance over
+$[e_G\,(3)\,|\,e_s\,(2)\,|\,e_\beta\,|\,e_b\,|\,e_{m_v}]$.
+
+\subsection{Propagation (50\,Hz)}
+With odometry $\zeta = (\zeta_x, \zeta_y, \zeta_\omega)$, the bias-corrected
+vessel twist is $\hat\zeta = (\zeta_x(1-\hat\beta) - \hat m_v,\; \zeta_y,\;
+\zeta_\omega - \hat b_g)$. The load-frame cable angle is reconstructed by the
+same-instant identity
+\begin{equation}\label{eq:sameinstant}
+\hat\sigma \;=\; \hat\sigma_i + \hat\theta_a - \mathrm{yaw}(\hat G),
+\end{equation}
+which ties the shape estimate to the gauge: a common yaw error rotates every
+agent's $\hat\sigma$ coherently (this is visible in closed loop as the rigid
+gauge orbit). The load twist follows the slaved model through the
+trivialization with the attach-point lever,
+\begin{equation}\label{eq:slaved}
+\hat\xi \;=\; \mathrm{Ad}_{T(a)}\,\mathrm{Ad}_{m(\hat s)}
+\bigl(\hat\zeta - \zeta_{\mathrm{rel}}\bigr) + \hat m_\xi ,
+\qquad
+\mathrm{Ad}_{T(a)} = \begin{bmatrix} I & Ja \\ 0 & 1\end{bmatrix},
+\end{equation}
+where $\zeta_{\mathrm{rel}} = (m^{-1}\dot m)^\vee$ is the shape-motion
+correction computed from the reduced shape ODEs. $\zeta_{\mathrm{rel}}$ is
+exact on the reduced plant and is validated there on straight tows; its
+$\eta$-channel is recursive (no instantaneous turn-rate source without an
+anchor) and is measurably unstable under persistent turns, so the record
+configuration runs with the correction \emph{off} on both plants --- a
+disclosed config choice that also removes every configuration delta from the
+cross-tier overlay. Then $\hat G \leftarrow \hat G\,\mathrm{Exp}(\Delta t\,
+\hat\xi)$, and the covariance propagates by $\Phi P \Phi^\top + Q$ with
+$\Phi_{GG} = \mathrm{Ad}_{\mathrm{Exp}(-\Delta t \hat\xi)}$, explicit
+$G$--bias couplings $\Phi_{G\beta} = -\Delta t\, \mathrm{Ad}_{m}
+(\zeta_x, 0, 0)^\top$, $\Phi_{Gb} = -\Delta t\, \mathrm{Ad}_m (0,0,1)^\top$,
+and the declared process noise $Q_G = \mathrm{diag}(4{\times}10^{-2},
+2{\times}10^{-2}, 10^{-3})\,\Delta t$. A Bayesian WLS ``radial'' observer over
+the exact rigid-cable constraint rows $b_j \cdot \xi_L = \rho_j$ (with
+$b_j = (\cos\sigma, \sin\sigma, a_x \sin\sigma - a_y\cos\sigma)$ and $\rho_j =
+\hat\zeta\cdot(\cos\sigma_i, \sin\sigma_i)$) is implemented and validated in
+isolation; it is staged off in the record because its exact posterior
+interacts adversely with the CI conservatism (elimination documented) ---
+centralizing removes exactly that interaction, which is how the B1 reference
+of Sec.~\ref{sec:results} is constructed.
+
+\subsection{Measurement channels}
+\emph{Direction (20\,Hz).} A scalar Joseph-form update on $\hat\sigma_i$ with
+noise $1/\kappa$ from the von-Mises concentration
+($\kappa = 1/(1^\circ)^2$), gain-clipped by a broadside guard when
+$|\cos\hat\sigma_i| < 0.1$ (the guard triggers on the \emph{estimate}, which
+measurably lags true broadside during fast gusts --- Sec.~\ref{sec:results}).
+\emph{Beacon (5\,Hz, anchored agent only).} Left-invariant residual
+$r = \mathrm{Log}(\hat G^{-1} Z)$ with a full Joseph update; auxiliary bias
+rows are innovation-gated (feeding network-convergence transients into slow
+states measurably destabilizes them); and the Friedland trim integrates
+innovation \emph{rates} in the converged regime only:
+$\hat m_\xi \leftarrow 0.995\,\hat m_\xi + 0.05\, r/\Delta t_b$ for
+$\|r_{xy}\| < 0.5$\,m, clamped to $\pm 0.1$.
+
+\subsection{The delayed-fusion rule and its exactness}
+The companion's fusion transports a neighbor packet, aged by $\tau$, through
+shape-conjugated maps. Writing packets in the trivialized form
+$H_j = \hat G_j\, m(\hat s_j)$ and composing the conjugation with the
+trivialization, the sender's shape \emph{telescopes out} of the executed
+composite, leaving
+\begin{equation}\label{eq:composite}
+T \;=\; H^{\mathrm{stale}}_j\, m(\hat s_j)^{-1}\,
+\mathrm{Exp}\!\bigl(\tau\,\hat\xi_{\mathrm{self}}\bigr),
+\qquad
+\hat\xi_{\mathrm{self}} = \mathrm{Ad}_{m(\hat s_{\mathrm{self}})}\hat\zeta_{\mathrm{self}},
+\end{equation}
+i.e., the receiver fast-forwards the stale packet by \emph{its own} current
+load-twist estimate; the correction applied is $\hat G \leftarrow \hat G\,
+\mathrm{Exp}(\alpha\, \mathrm{Log}(\hat G^{-1} T))$ with fixed gain
+$\alpha = \kappa_g \Delta_c$. Two properties make this rule the design under
+test. \emph{(Exactness at frozen shapes.)} If shapes are constant and
+propagation is noise-free, the fused residual vanishes identically: both
+agents integrate the same load twist through constant conjugations, so the
+fast-forwarded stale packet reproduces the receiver's estimate exactly. This
+is verified to machine precision ($D_{ss} \sim 10^{-29}$) on both harness
+generations and pinned by a regression test; it implies the closed-loop floor
+is excited \emph{only} by shape motion, the mechanism check of
+Sec.~\ref{sec:results}. \emph{(First-order mismatch.)} With moving shapes the
+composite carries the staleness of $\hat s$ inside $\hat\xi$, producing the
+$O(\tau)$ transport-mismatch channel that dominates closed-loop disagreement
+at realistic noise --- distinct from the $O(\tau^2)$ holonomy of the
+companion's theorem, which lives at the error-transport level.
+Optional edge weights follow the companion's Def.~4.1 series-information form,
+$w_e = (1/\iota_i + 1/\iota_j)^{-1}$ with $\iota = \cos^2\!\sigma_i /
+\cos^4\!\sigma$ (the ablation of Sec.~\ref{sec:results} measures their
+benefit).
+
+\subsection{Covariance architecture}
+Fusion covariances combine by covariance intersection on the $G$-block
+($\omega$-grid) followed by explicit cross-block decorrelation (zeroing
+$P_{G,\mathrm{aux}}$); all measurement updates are Joseph-form. This
+architecture is the survivor of a documented elimination: naive block-CI
+violates positive semidefiniteness through the Schur complement; congruence
+transport of cross-terms compounds them ($1.47 \to 273$ in anchored ANEES);
+and Schmidt-feeding bias states from fusion residuals mis-attributes the
+moving-shape transport residual. The price, disclosed wherever cited: CI over
+mutually correlated estimates is structurally optimistic
+($\sim$3--4$\times$ at the calibration horizon), and sustained Kalman
+anchoring collapses the anchored agent's covariance until its beacon gain
+starves on long transits --- the two covariance mechanisms fail in opposite
+directions, a boundary this paper measures rather than hides.
+
+\subsection{Theoretical positioning and contributions}
+The proven results this paper builds on belong to the companion and are used
+with their hedges: the three-dimensional gauge kernel and its collapse under a
+single anchor (Thm~5.1, Cor~5.2; proven); contraction of the gauge complement
+at rate governed by $\kappa\lambda_2$ for the frozen/LTV linearization
+(Thm~6.3, an inequality; tested in its domain in Sec.~\ref{sec:results});
+and the leading-order, deterministic error-transport holonomy
+$\|\mathrm{Log\,Hol}\| = \tau^2\|[C_i, C_j]\| + O(\tau^3)$ with
+$C_j = \mathrm{Ad}_{m(s_j)}\,\mathrm{ad}_\xi\,\mathrm{Ad}_{m(s_j)}^{-1}$
+(Thm~7.2 with Cor~7.3; proven, with the stochastic steady-state floor
+explicitly conjectural). Against that backdrop, this paper's own theoretical
+contributions are: (i)~the executed-composite reduction
+\eqref{eq:composite} of the companion's fusion rule, with the frozen-shape
+exactness property and its corollary that shape motion is the sole excitation
+of the closed-loop floor; (ii)~the epistemic-ladder experimental framework ---
+three staleness exponents attached to three distinct objects (state-level
+mismatch, closed-loop floor, error-transport holonomy), with pre-registered
+falsifiers and measured-not-fitted noise floors --- which is what allowed a
+conjecture to be falsified cleanly on two plants without damaging the proven
+layer; and (iii)~the measured boundary results: the reduced model's validity
+domain for maneuvering amplitudes, the horizon dependence of CI calibration,
+and the spectral distinction between consensus contraction ($\lambda_2$,
+verified) and single-anchor pinning (anchor-limited, measured).
+
 \section{Two plants, one estimator}
 The reduced plant integrates the theory's shape ODEs directly (RK4, with
 declared process noise); the multibody plant is Drake with SAP contact,
