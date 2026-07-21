@@ -1,6 +1,6 @@
 \relax 
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Gauge spectrum: $\qopname  \relax o{dim}\qopname  \relax o{ker}L_\mathcal  {F} = 3$ with the harmonic sections exactly the body-framed images of one common load-frame perturbation; one anchor removes the kernel.}}{1}{}\protected@file@percent }
-\newlabel{fig:f3}{{1}{1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The reduced plant and its communication structure: shapes $s_j = (\sigma _j, \sigma _{i,j})$ on taut unit cables; the comms graph (dashed) is a controlled variable --- (a) the $C_5$ default, (b) $K_5$.}}{1}{}\protected@file@percent }
+\newlabel{fig:plantF}{{1}{1}}
 \newlabel{thm:gaugeF}{{5.1}{}}
 \newlabel{cor:pinF}{{5.2}{}}
 \newlabel{thm:contractF}{{6.3}{}}
@@ -8,23 +8,49 @@
 \newlabel{cor:symF}{{7.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Numerical verification}{1}{}\protected@file@percent }
 \newlabel{sec:numerics}{{I}{1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-A}}Gauge structure and pinning (E1; Thm.\nobreakspace  {}5.1\hbox {}, Cor.\nobreakspace  {}5.2\hbox {})}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-B}}The theorem's object: amplitude, coefficient, switch-offs (E3a; Thm.\nobreakspace  {}7.2\hbox {})}{1}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces F4a: the leading-order, deterministic holonomy amplitude of Thm.\nobreakspace  {}7.2\hbox {} --- slope 1.999, coefficient 1.0000, switch-offs at machine zero.}}{1}{}\protected@file@percent }
-\newlabel{fig:f4a}{{2}{1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces E3a extension arms: formation-invariant order; uniform $O(\tau ^3)$ remainder; the level-set symmetry class; coefficient ratio $\to 1$.}}{1}{}\protected@file@percent }
-\newlabel{fig:f4aext}{{3}{1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-C}}The conjectured closed-loop floor, falsified in its own regime (E3b)}{1}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Numerical evidence for the conjectured stochastic steady-state floor ([ES \S  10(ii)]); Theorem\nobreakspace  {}7.2\hbox {} is leading-order and deterministic and is tested in Fig.\nobreakspace  {}2\hbox {}. Fitted excess exponent 1.101 [1.076, 1.125]: the conjectured order 2 is excluded (and so is 1); the frozen+noise-off regression reproduces the executed null ($D_{ss} \sim 10^{-30}$).}}{2}{}\protected@file@percent }
-\newlabel{fig:f4b}{{4}{2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces F5: amplitude (a) and closed-loop floor (b) $\varepsilon $-response, never mixed in one panel.}}{2}{}\protected@file@percent }
-\newlabel{fig:f5tc}{{5}{2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-D}}Symmetry: two metrics, two exponents (E3c; Cor.\nobreakspace  {}7.3\hbox {})}{2}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces F8: rate versus $\kappa \lambda _2$ across two topologies, slope 1.40 (falsifier $< 0.5$); $\mu $ calibrated at $\kappa = 0$, so the identity line is anchored, not predicted; the nonlinear extension is open.}}{2}{}\protected@file@percent }
-\newlabel{fig:f8tc}{{6}{2}}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Switch-off ladder (Tier-1 rows). Each arm kills the effect on command or shifts its order as predicted.}}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-E}}Contraction in its own domain (E2; Thm.\nobreakspace  {}6.3\hbox {})}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-F}}Numerics invariance (E10)}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-G}}Switch-off ladder}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-H}}Reproducibility}{2}{}\protected@file@percent }
-\gdef \@abspage@last{2}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-A}}Plant, protocol, and information structure}{1}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The executed estimator pipeline and its information boundary: local sensing (odometry, cable direction), $\tau $-stale shared estimates transported through $\rho = \mathrm  {Ad}_m \circ \pi _L$ with sheaf weights $w_e$, and at most one absolute anchor. Nothing else touches truth (linted).}}{1}{}\protected@file@percent }
+\newlabel{fig:archF}{{2}{1}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Experimental configuration (Tier-1).}}{1}{}\protected@file@percent }
+\newlabel{tab:configF}{{I}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-B}}Gauge structure and pinning (E1; Thm.\nobreakspace  {}5.1\hbox {}, Cor.\nobreakspace  {}5.2\hbox {})}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-C}}The theorem's object: amplitude, coefficient, switch-offs (E3a; Thm.\nobreakspace  {}7.2\hbox {})}{1}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Executed cell matrix of this section.}}{2}{}\protected@file@percent }
+\newlabel{tab:matrixF}{{II}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Gauge spectrum: $\qopname  \relax o{dim}\qopname  \relax o{ker}L_\mathcal  {F} = 3$ with the harmonic sections exactly the body-framed images of one common load-frame perturbation; one anchor removes the kernel.}}{2}{}\protected@file@percent }
+\newlabel{fig:f3}{{3}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-D}}The conjectured closed-loop floor, falsified in its own regime (E3b)}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-E}}Symmetry: two metrics, two exponents (E3c; Cor.\nobreakspace  {}7.3\hbox {})}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces F4a: the leading-order, deterministic holonomy amplitude of Thm.\nobreakspace  {}7.2\hbox {} --- slope 1.999, coefficient 1.0000, switch-offs at machine zero.}}{2}{}\protected@file@percent }
+\newlabel{fig:f4a}{{4}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces E3a extension arms: formation-invariant order; uniform $O(\tau ^3)$ remainder; the level-set symmetry class; coefficient ratio $\to 1$.}}{2}{}\protected@file@percent }
+\newlabel{fig:f4aext}{{5}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-F}}Contraction in its own domain (E2; Thm.\nobreakspace  {}6.3\hbox {})}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Numerical evidence for the conjectured stochastic steady-state floor ([ES \S  10(ii)]); Theorem\nobreakspace  {}7.2\hbox {} is leading-order and deterministic and is tested in Fig.\nobreakspace  {}4\hbox {}. Fitted excess exponent 1.101 [1.076, 1.125]: the conjectured order 2 is excluded (and so is 1); the frozen+noise-off regression reproduces the executed null ($D_{ss} \sim 10^{-30}$).}}{3}{}\protected@file@percent }
+\newlabel{fig:f4b}{{6}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Behind the fitted exponent: (a) per-run $D_{ss}$ CDFs by arm at $\tau = 0.4$ (1584-run production record); (b) paper-rule spread across seeds/formations per $\tau $. $D_{ss}$ is the stochastic steady-state object [\textsc  {[conjectural]}{} regime] --- measured, not a test of Thm.\nobreakspace  {}7.2\hbox {}.}}{3}{}\protected@file@percent }
+\newlabel{fig:dssdist}{{7}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-G}}Numerics invariance (E10)}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-H}}Connectivity and the floor (E6; exploratory)}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The C9c trip at run level: generic vs.\ symmetric-class $D_{ss}$ under 20\% jitter + 10\% drops (outside class $\mathcal  {P}$). Median ratio $2.75\times \,[1.94, 3.89]$ --- protection persists but falls an order short of the registered $10\times $.}}{3}{}\protected@file@percent }
+\newlabel{fig:robustF}{{8}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces F5: amplitude (a) and closed-loop floor (b) $\varepsilon $-response, never mixed in one panel.}}{3}{}\protected@file@percent }
+\newlabel{fig:f5tc}{{9}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-I}}Switch-off ladder and the transport-rule ablation}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-J}}The adjudicated ledger, in one figure}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces F8: rate versus $\kappa \lambda _2$ across two topologies, slope 1.40 (falsifier $< 0.5$); $\mu $ calibrated at $\kappa = 0$, so the identity line is anchored, not predicted; the nonlinear extension is open.}}{4}{}\protected@file@percent }
+\newlabel{fig:f8tc}{{10}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces E10: the fitted exponent across a $10\times $ range of integrator steps; all CIs share the green band $[1.185, 1.256]$.}}{4}{}\protected@file@percent }
+\newlabel{fig:dtF}{{11}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-K}}Supplementary movies}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {I-L}}Reproducibility and artifact registry}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces E6 (exploratory, C10): floor vs.\ topology$\times N$ ordered by $\lambda _2$, at moderate ($\tau {=}0.2$) and high ($\tau {=}0.8$) staleness. Connectivity suppresses the floor $5\times $ at moderate $\tau $; the benefit collapses at high $\tau $.}}{4}{}\protected@file@percent }
+\newlabel{fig:topoF}{{12}{4}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Switch-off ladder (Tier-1 rows). Each arm kills the effect on command or shifts its order as predicted.}}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces E3b transport-rule and control arms, median $D_{ss}$ by staleness [\textsc  {[conjectural]}{} object]. The Tier-1 A1-below-paper inversion is shown, not smoothed: $D_{ss}$ is a disagreement metric and never ranks rules --- ranking is done on the companion's truth-referenced metrics. The noise-off frozen null ($D_{ss} \sim 10^{-30}$) lies 27 orders below the axis and is reported in the table.}}{5}{}\protected@file@percent }
+\newlabel{fig:ladderF}{{13}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces The complete Tier-1 falsifier ledger, verdicts as adjudicated: green passed, red falsified/met (\textsc  {[conjectural]}{} rows --- measured slopes reported as measured), orange tripped favorably. Grey marks the registered references; the evidence record is named per row.}}{5}{}\protected@file@percent }
+\newlabel{fig:forestF}{{14}{5}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Experiment registry (cell $\to $ driver $\to $ record $\to $ probe).}}{5}{}\protected@file@percent }
+\newlabel{tab:registryF}{{IV}{5}}
+\gdef \@abspage@last{5}

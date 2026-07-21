@@ -103,6 +103,26 @@ receives a docking beacon (5\,Hz full load pose,
 $\sigma = (5\,\mathrm{cm}, 5\,\mathrm{cm}, 0.5^\circ)$) in the final
 approach. Packets circulate on the $C_N$ cycle with staleness $\tau$.
 
+Figure~\ref{fig:scenario} fixes the task and the information problem in one
+view: panel (a) the dogleg channel, the tow, and the range-limited docking
+beacon --- absolute information exists \emph{only} near the dock, and only at
+one vessel; panel (b) the staleness ladder the estimator actually lives on,
+from 50\,Hz local sensing down to the $\tau$-stale neighbor channel that is
+the paper's central variable. The price of that staleness is the paper's
+subject: proven $\tau^2$ at the error-transport level, measured
+$\approx\tau^{1.08}$ for the stochastic closed-loop floor
+(\conjtag{} regime).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_scenario.pdf}
+  \caption{(a)~The Blind Harbor Transit: a GNSS-denied dogleg channel, one
+  range-limited docking beacon at one vessel. (b)~The information-staleness
+  ladder: local sensing is fast, shared estimates are $\tau$-stale, absolute
+  fixes exist only at the dock.}
+  \label{fig:scenario}
+\end{figure}
+
 Each agent runs DIEKF-$\Sigma$: an invariant EKF on the load pose whose
 propagation uses the bias-corrected slaved twist through the cable geometry;
 whose direction channel is a Joseph-form scalar update with a broadside guard;
@@ -279,6 +299,24 @@ precisely what our experiments falsify at realistic noise, while every
 \provtag{} statement above survives, several at coefficient precision.
 
 \section{The DIEKF-$\Sigma$ method in full}\label{sec:method}
+Figure~\ref{fig:arch} previews the architecture this section derives, and
+draws the boundary the whole evaluation depends on: the plant side (Drake
+multibody dynamics, drag, thrusters --- physics that legitimately reads plant
+state) is separated from the estimator side by the sensor models, and that
+separation is machine-checked by a truth-isolation lint over the built
+diagram: no estimator input port can reach plant state except through a
+declared sensor. Commands are truth-free by construction. Every subsection
+below fills in one block of this figure.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_architecture.pdf}
+  \caption{DIEKF-$\Sigma$ as executed, with the linted plant/estimator
+  boundary. Per agent: invariant propagation through the slaved twist,
+  direction updates with the broadside guard, executed-composite delayed
+  fusion with CI covariance handling, and (one agent) the beacon channel.}
+  \label{fig:arch}
+\end{figure}
 
 \subsection{Geometry, trivialization, and state}
 Work on $SE(2)$ with elements $g = (R(\theta), p)$, exponential
@@ -453,6 +491,55 @@ response; and the multibody plant's realized maneuvering shapes were found to
 exit the reduced model's stable domain --- a measured validity-domain
 boundary.
 
+Tables~\ref{tab:plantmodel} and~\ref{tab:campmatrix} fix, respectively, the
+multibody model a reimplementation needs and the executed campaign matrix
+this paper reports from.
+
+\begin{table}[t]
+\centering
+\caption{Multibody plant and estimator configuration.}
+\label{tab:plantmodel}
+\begin{tabular}{ll}
+\toprule
+simulator & Drake 1.51.1, SAP contact, $h = 1$\,ms (D8 sweeps
+$\{0.5, 1, 2\}$\,ms) \\
+load & pentagon caisson, 2\,500\,kg, circumradius 4\,m \\
+vessels & $N \in \{4, 5\}$ ASVs, cables 12\,m, distance-constraint +
+analytic tension \\
+hydrodynamics & linear drag on load and vessels; scripted lateral gust hook
+(D10c) \\
+control & fan-holding heading control + cable-alignment trim; dogleg and
+decel schedules \\
+estimator $Q_G$ & $\mathrm{diag}(4\times10^{-2}, 2\times10^{-2},
+1\times10^{-3})\,\Delta t$ (declared) \\
+comms & $C_N$ cycle; staleness $\tau$; drop/jitter gate (D10b arms) \\
+seeds & id-keyed; 50 transit seeds (D7), 12 (hero v2), 8 (D10b) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Executed campaign matrix (multibody cells).}
+\label{tab:campmatrix}
+\begin{tabular}{lll}
+\toprule
+cell & varies & reported in \\
+\midrule
+D2/D4 + controls & $\tau \times$ arm; straight-tow $D_0$ & Fig.~\ref{fig:f4b} \\
+D3 & $\tau$, symmetric class & Fig.~\ref{fig:f4a}, \ref{fig:f5} \\
+D6 & fusion weights (tension channel) & ledger \\
+D7 & 4 arms $\times$ 50 transits & Table~\ref{tab:scorecard},
+Fig.~\ref{fig:scorestats} \\
+D8 & integrator step $h$ & Sec.~\ref{sec:results} \\
+D9 & topology $\times N$ ($\lambda_2$) & Fig.~\ref{fig:d9} \\
+D10(b,c) & drops/jitter; gust envelope & Fig.~\ref{fig:robust} \\
+hero v1/v2 & transit; decel remedy & Fig.~\ref{fig:heroseries},
+\ref{fig:v2seeds} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Results}\label{sec:results}
 
 \subsection{Gauge pinning (Cor.~5.2 in closed loop)}
@@ -497,6 +584,86 @@ B0 (dead-reckon) & 1.25 & 66.7 & 134.1 & 9624 & 43.8 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Figure~\ref{fig:heroseries} grounds the narrative in the recorded transit
+itself: the truth trajectory of barge and vessels through the two legs and
+the $60^\circ$ turn, and the two observables whose separation is the paper's
+point --- disagreement $D(t)$, which the maneuver excites and staleness
+floors, and the gauge-kernel component, which grows unbounded through
+GNSS denial and is killed \emph{only} by the beacon. The $D(t)$ spike at
+acquisition is not an artifact: it is the pin shock, the anchored agent
+snapping to truth against a fleet still carrying the drifted gauge --- the
+same consensus-stiffness mechanism that D9 finds anti-ordering re-lock with
+connectivity. Figure~\ref{fig:agenterr} shows the per-agent anatomy at the
+130\,s calibration horizon, where the anchor \emph{does} propagate cleanly
+through fusion --- the contrast row for the long-horizon starvation disclosed
+below.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_hero_series.pdf}
+  \caption{The recorded 450\,s dogleg transit (from the committed
+  \texttt{hero\_dogleg\_series.npz}). (a)~Truth: barge + 5 vessels, turn and
+  beacon windows marked. (b)~Disagreement $D(t)$ vs.\ the gauge-kernel
+  component: the maneuver excites the former; only the beacon kills the
+  latter; the acquisition spike in $D$ is the pin shock.}
+  \label{fig:heroseries}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{ral_agent_errors.pdf}
+  \caption{Per-agent load-pose error at the 130\,s calibration horizon
+  (recorded \texttt{hero\_series.npz}): the beacon at agent~0 (gold, from
+  30\,s) propagates through fusion to the whole fleet --- at this horizon.
+  The 450\,s failure of this picture is the gain-starvation finding of
+  Fig.~\ref{fig:v2seeds}.}
+  \label{fig:agenterr}
+\end{figure}
+
+\subsection{Docking outcomes at distribution level, and the v2 remedy}
+The scorecard's means hide neither the ordering nor the failure --- but the
+distributions carry more. Figure~\ref{fig:scorestats} shows all 200 transit
+outcomes: the per-arm boxes and the per-seed CDFs. The ordering
+B1$^{\mathrm{lim}} >$ paper $>$ B2 $\gg$ B0 holds \emph{seed-wise}, not just
+in aggregate: paired by seed, the paper rule beats B2 on fleet-mean in 41/50
+transits and B0 in 50/50, while the zero-latency limit beats the paper rule
+in 47/50 --- staleness is the price, measured seed by seed. The 0.5\,m spec
+line sits left of every arm's support: 0\% success at plan-faithful
+acquisition, including the zero-latency reference --- the approach geometry,
+not the estimator, binds.
+
+Figure~\ref{fig:v2seeds} then reports the tested remedy at seed level: the
+decelerating approach (v2) improves fleet-mean accuracy $2.4\times$ (median
+0.62\,m; 17\% of seeds under the spec) --- necessary but not sufficient ---
+and exposes the residual mechanism honestly: the \emph{anchored} agent is
+worse than the fleet mean on 11 of 12 seeds. Sustained Kalman anchoring
+collapses its covariance until the beacon gain starves, while CI's
+structural conservatism keeps the unanchored agents' gains healthy; the
+trim-contamination hypothesis for the same effect was tested and falsified
+(frozen-trim runs bit-identical). Best, median, and worst seeds are marked
+--- the worst seed (fleet-mean 2.1\,m) is shown, not clipped.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_scorecard_stats.pdf}
+  \caption{The 50-transit scorecard at distribution level. (a)~Fleet-mean
+  dock error per arm (log scale --- B0's failure is two orders, not a tail).
+  (b)~Per-seed CDFs: the ordering holds seed-wise; the 0.5\,m spec (dotted)
+  is left of every support. Seed-paired win counts in the strip.}
+  \label{fig:scorestats}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{ral_v2_seeds.pdf}
+  \caption{Hero v2 (decelerating approach), all 12 seeds sorted: fleet-mean
+  vs.\ anchored-agent dock error. Median 0.62\,m, 17\% under spec ---
+  improvement without sufficiency; the anchored agent is worse than the
+  fleet mean on 11/12 seeds (gain starvation); best/median/worst marked,
+  worst shown.}
+  \label{fig:v2seeds}
+\end{figure}
 
 \subsection{The theorem's object, measured on both plants}
 \begin{figure}[t]
@@ -602,6 +769,57 @@ the reduced plant (CIs share $[1.185, 1.256]$) and across $h \in \{0.5, 1,
 verified genuine by direct truth-trajectory differencing, 1.35\,mm over
 30\,s). Solver artifacts do not alias into any exponent this paper reports.
 
+\subsection{Robustness outside the protocol class (D10)}
+Figure~\ref{fig:robust} characterizes degradation outside protocol class
+$\mathcal{P}$ --- pre-registered as characterization, with red-flag rules
+rather than falsifiers. Panel (a): under packet drops the floor degrades
+gracefully, $+13\%$ at $p = 0.1$ and $+45\%$ at $p = 0.3$ (the jitter arm is
+milder), with the anchored ANEES still in-gate at $p = 0.3$ (4.23, at the
+130\,s horizon --- the horizon travels with the number). No red flags fired.
+Panel (b) reports a null with a mechanism: the broadside guard was never
+exercised in the paired gust campaign because its trigger --- the
+\emph{estimated} cable angle $\hat\sigma_i$ --- lags true broadside
+throughout the reachable envelope (closest approach: true 0.027 vs.\
+estimated 0.106 at the 5\,000\,N probe). Guard-on and guard-off runs are
+bit-identical; the set-piece rescue movie therefore does not ship, and the
+recorded design note (a lag-aware margin) is the honest deliverable.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_robustness.pdf}
+  \caption{D10 robustness characterization (outside class $\mathcal{P}$).
+  (a)~Floor vs.\ packet-drop probability, drops-only and drops+jitter arms
+  (8 seeds each; mean $\pm$ sd): graceful, no red flags; anchored ANEES
+  in-gate at $p{=}0.3$ at the 130\,s horizon. (b)~Why the broadside guard
+  never fired: $\hat\sigma_i$ lags true broadside across the reachable gust
+  envelope --- ON $\equiv$ OFF, reported as a null with its mechanism.}
+  \label{fig:robust}
+\end{figure}
+
+\subsection{The adjudicated ledger, in one figure}
+Figure~\ref{fig:dforest} renders the multibody falsifier ledger with its
+registered references and verdicts --- passes and failures on one axis, none
+dressed. The left panel carries the exponent/ratio rows: the theorem's
+object green to coefficient precision; the \conjtag{} closed-loop exponent
+red, falsified against the conjectured order at these scales; the cross-tier
+coefficient ratio red at $\times 5$ with its first localization rung run
+(the baseline agrees to 12\%; the excess is attributed to the reduced
+plant's inertia-free shape response). The right panel carries differences
+and correlations, including both D9 findings: pin-rate uncorrelated with
+connectivity (anchor-limited, the ES-01 path), and re-lock
+\emph{anti}-ordering with connectivity (consensus stiffness). A reviewer can
+reconstruct the paper's claims-and-verdicts state from this figure alone.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_forest.pdf}
+  \caption{The multibody falsifier ledger, verdicts as adjudicated: green
+  passed, red falsified / fired, orange anti-ordered. Grey marks registered
+  references and equivalence bands; evidence record named per row. \conjtag{}
+  rows report measured slopes as measured --- no law asserted.}
+  \label{fig:dforest}
+\end{figure}
+
 \section{Discussion}
 \paragraph{The epistemic ladder as data.} The campaign's central result is a
 separation, measured on both plants: the proven $\tau^2$ holonomy verifies to
@@ -638,7 +856,10 @@ read this as evidence that the measurement architecture --- per-agent
 Kalman-weighted constraint channels composed through conjugated transports ---
 is where the accuracy lives, which is the design thesis under test.
 
-\paragraph{Honest limits.} The docking specification is unmet by every arm at
+\paragraph{Honest limits.} Figure~\ref{fig:taxonomy} organizes the four
+adverse findings as a taxonomy --- finding, measured cause, recorded remedy
+class, evidence file --- so the limits are as structured as the results.
+The docking specification is unmet by every arm at
 plan-faithful beacon acquisition, including the zero-latency reference: the
 approach geometry, not the estimator, binds. A decelerating approach is
 necessary and was tested: it improves fleet-mean accuracy $2.4\times$ (median
@@ -658,11 +879,104 @@ is the recorded design note. Slack-cable events are outside this plant's
 validity domain (bilateral distance constraints), scoped to future work with
 unilateral cables.
 
-\section{Reproducibility}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_failure_taxonomy.pdf}
+  \caption{Failure and limit taxonomy: each adverse finding with its
+  measured cause and recorded remedy class. Tested-and-falsified remedy
+  hypotheses (the m$_\xi$-trim freeze) are stated inside the cause cards.}
+  \label{fig:taxonomy}
+\end{figure}
+
+\section{Supplementary movies}
+Four supplementary movies ship with the paper; each is generated by a seeded,
+versioned script, and none is evidentiary --- every quantitative claim traces
+to the committed campaign records, with the movies as faithful visualizations
+of recorded or re-runnable runs.
+
+\emph{S1 (hero\_dogleg\_web.mp4).} The full 450\,s transit as a five-beat
+storyboard ($9\times$ time compression, badged on screen): gauge-orbit drift
+through GNSS denial, the turn bloom in $D(t)$, beacon pinning, and the honest
+docking scorecard as the closing card.
+
+\emph{S2 (hero\_blind\_harbor.mp4).} The gauge-pinning demonstration with
+ghost-caisson overlays: each agent's private load estimate drawn as a
+translucent caisson --- coherently drifting, overlapping each other while
+offset from truth --- and the $D(t)$ spike at acquisition, which is
+Cor.~5.2 live.
+
+\emph{S3 (tow\_N5.mp4).} The physical scenario itself: the $N{=}5$ pentagon
+tow in the multibody plant --- cables, drag, thrust allocation --- so the
+reader sees the plant, not a diagram.
+
+\emph{S4 (error\_anatomy.mp4).} The failure-case movie, shipped deliberately:
+hero v2's fleet-mean \emph{median} seed, per-agent errors alongside the
+scene. Pre-beacon, the fleet drifts \emph{together} (the gauge, not
+disagreement); post-beacon, the unanchored agents converge through fusion
+while the anchored agent --- covariance collapsed by sustained anchoring ---
+starves its own beacon gain and stays high. The movie shows the paper's
+binding limit, not its best case.
+
+\section{Reproducibility and artifact registry}
 Every number in this paper traces to a seeded, versioned driver and a committed
 data file; \texttt{campaign\_replay.py} re-executes per-run probes that must
 match the committed records exactly (Tier-1 to $10^{-9}$; Drake to $10^{-6}$),
 and \texttt{--run CELL} regenerates any full campaign.
+Table~\ref{tab:registry} maps each reported cell to its driver and record;
+the paper-figure generator (\texttt{analysis/figures/ral\_artifacts.py})
+reads \emph{only} these committed records --- it re-simulates nothing --- so
+the figures cannot drift from the campaign. Movie generators are versioned
+beside the drivers; S4's underlying run is itself persisted
+(\texttt{error\_anatomy\_series.npz}).
+
+\begin{table}[t]
+\centering
+\caption{Artifact registry (drivers in \texttt{tier2\_drake/}; records in
+\texttt{results/s1/}).}
+\label{tab:registry}
+\begin{tabular}{lll}
+\toprule
+cell & driver & record \\
+\midrule
+D2/D4+controls & \texttt{campaign/\{production\_d2\_d4,d2\_*\}.py} &
+\texttt{production\_d2\_d4\_v2.json} etc. \\
+D3 & \texttt{blind\_harbor/d3\_amplitude.py} & \texttt{d3\_amplitude.json} \\
+D6 & \texttt{campaign/d6\_tension.py} & \texttt{d6\_tension.json} \\
+D7 & \texttt{campaign/d7\_scorecard.py} & \texttt{d7\_scorecard.json} \\
+D8 & \texttt{campaign/d8\_h\_sweep.py} & \texttt{d8\_h\_sweep.json} \\
+D9 & \texttt{campaign/d9\_scaling.py} & \texttt{d9\_scaling.json} \\
+D10(b,c) & \texttt{campaign/d10\{b,c\}\_*.py} & \texttt{d10b\_loss.json},
+\texttt{d10c\_guard.json} \\
+B1/baselines & \texttt{campaign/\{baselines,b1\_true\}.py} &
+\texttt{baselines.json}, \texttt{b1\_*.json} \\
+hero v1/v2 & \texttt{blind\_harbor/hero\_dogleg.py},
+\texttt{campaign/hero\_v2\_ensemble.py} & \texttt{hero\_*.npz/json} \\
+movies & \texttt{blind\_harbor/hero*.py},
+\texttt{campaign/error\_anatomy\_movie.py} & \texttt{*.mp4} + npz \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Research-artifact package}
+The paper ships as a structured evidence system rather than a set of plots:
+conceptual artifacts (the scenario and staleness ladder,
+Fig.~\ref{fig:scenario}; the linted architecture, Fig.~\ref{fig:arch});
+configuration artifacts (plant model and campaign matrix,
+Tables~\ref{tab:plantmodel}--\ref{tab:campmatrix}); primary quantitative
+evidence (the scorecard and its distributions,
+Table~\ref{tab:scorecard}, Fig.~\ref{fig:scorestats}; the recorded transit,
+Fig.~\ref{fig:heroseries}; both-plant overlays, Figs.~\ref{fig:f4a}--%
+\ref{fig:f4c}); causal attribution (ablations and symmetry,
+Figs.~\ref{fig:f5}, \ref{fig:d9}; the v2 seed-level remedy test,
+Fig.~\ref{fig:v2seeds}); robustness (Fig.~\ref{fig:robust}); statistical
+integrity (the adjudicated ledger, Fig.~\ref{fig:dforest}); failure
+analysis (the taxonomy, Fig.~\ref{fig:taxonomy}; the per-agent anatomy,
+Fig.~\ref{fig:agenterr}); four movies including a deliberate failure-case
+movie (S4); and the executable registry of Table~\ref{tab:registry} with
+its deterministic replay harness. Every adverse finding in the package
+carries its measured cause and its recorded remedy class; every ANEES
+number carries its horizon; and no disagreement metric is ever presented as
+a correctness ranking.
 
 \section{Conclusion}
 On two independent plants sharing one estimator, the proven leading-order

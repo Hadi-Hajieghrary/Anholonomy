@@ -64,6 +64,13 @@ MANIFEST = {
               f"{R2}/d7_scorecard.json", "EXACT", "probe_d7"),
     "b1lim": ("RA-L B1 reference", "inline (b1_limit_mfab.json note)",
               f"{R2}/b1_limit_mfab.json", "EXACT", "probe_b1lim"),
+    "artT1": ("LCSS/TCNS paper-artifact figures",
+              "tier1_sheaf/campaign/paper_artifacts.py",
+              f"{R1}/artifacts/commutator_heatmap_meta.json", "EXACT",
+              "probe_art_t1"),
+    "anatS4": ("RA-L movie S4 (failure anatomy)",
+               "tier2_drake/campaign/error_anatomy_movie.py",
+               f"{R2}/error_anatomy_series.npz", "EXACT", "probe_anatomy"),
 }
 
 
@@ -255,6 +262,54 @@ def probe_b1lim():
                           turn_amp=0.0), 0)
     return (f"config re-executes (D={fresh:.3e}); per-seed err/anees recorded "
             f"with rerun provenance; agg err {rec['err']:.4f}")
+
+
+def probe_art_t1():
+    """Paper-artifact figures: re-derive the two NEW cited numbers (the C15
+    level partner and the domain knee) and check the persisted meta records;
+    the generator itself replays the e3a_extension draw sequence and asserts
+    it (import-time) — run it via --run artT1 for the full check."""
+    import numpy as np
+    from scipy.optimize import minimize
+    from tier1_sheaf.core.shapes import conjugated_generator
+    from tier1_sheaf.sheaf.holonomy import (two_agent_commutator,
+                                            holonomy_amplitude_m2)
+    XI = np.array([0.4, 0.0, 0.12])
+    hm = json.load(open(f"{R1}/artifacts/commutator_heatmap_meta.json"))
+    ext = json.load(open(f"{R1}/e3a_extension.json"))
+    s_ref = ext["C15"][0]["shapes"][:2]
+    Cr = conjugated_generator(s_ref[0], s_ref[1], XI)
+    f = lambda s: float(np.linalg.norm(
+        (lambda C: Cr @ C - C @ Cr)(conjugated_generator(s[0], s[1], XI))))
+    r = minimize(f, ext["C15"][0]["shapes"][2:], method="Nelder-Mead",
+                 options={"xatol": 1e-13, "fatol": 1e-15, "maxiter": 4000})
+    sep = float(np.hypot(r.x[0] - s_ref[0], r.x[1] - s_ref[1]))
+    assert _close(sep, hm["partner_sep"], 1e-6), (sep, hm["partner_sep"])
+    dom = json.load(open(f"{R1}/artifacts/domain_boundary_meta.json"))
+    si, sj = map(tuple, dom["shapes"])
+    K = float(np.linalg.norm(two_agent_commutator(si, sj, XI)))
+    ts = np.geomspace(0.05, 12.0, 60)
+    rel = np.array([abs(holonomy_amplitude_m2(si, sj, XI, t) - t**2 * K)
+                    / (t**2 * K) for t in ts])
+    knee = float(ts[np.argmax(rel > 0.10)])
+    assert _close(knee, dom["knee_tau_10pct"], 1e-9), (knee, dom["knee_tau_10pct"])
+    return (f"level-partner sep {sep:.6f} == meta; domain knee {knee:.3f} == "
+            f"meta (1e-9)")
+
+
+def probe_anatomy():
+    """S4 movie record: the persisted per-agent error series must reproduce
+    the hero_v2_ensemble fleet-mean for its seed exactly (same config, same
+    seed, two independent reductions of the same run)."""
+    import numpy as np
+    z = np.load(f"{R2}/error_anatomy_series.npz")
+    assert int(z["seed"]) == 10
+    v2 = json.load(open(f"{R2}/hero_v2_ensemble.json"))
+    rec = next(r for r in v2 if r["seed"] == 10)
+    ks = z["ts"] >= 500.0
+    pm = float(np.mean(z["errs"][ks].mean(axis=1)))
+    assert _close(pm, rec["pm"], 1e-9), (pm, rec["pm"])
+    return f"S4 series fleet-mean {pm:.6f} == hero_v2_ensemble seed 10 (1e-9)"
 
 
 def main():

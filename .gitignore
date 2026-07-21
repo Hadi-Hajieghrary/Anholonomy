@@ -433,3 +433,10 @@ refs
 .devcontainer
 
 .github
+
+# paper-artifact outputs are versioned records (replay probes read their meta
+# JSONs) — un-ignore them from the .NET template's generic artifacts/ rule
+!tier1_sheaf/results/artifacts/
+!tier1_sheaf/results/artifacts/**
+!tier2_drake/results/s1/artifacts/
+!tier2_drake/results/s1/artifacts/**

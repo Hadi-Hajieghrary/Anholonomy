@@ -6,3 +6,6 @@ Multimedia attachments (RA-L submission):
                            the D(t) spike at acquisition is Cor 5.2 live)
 - tow_N5.mp4             — the physical scenario (N=5 pentagon tow, Drake)
 Referenced from the manuscript as "supplementary video S1/S2/S3".
+- error_anatomy.mp4      — S4: failure-case anatomy (hero v2 median seed;
+                           anchored-agent gain starvation; recorded series in
+                           results/s1/error_anatomy_series.npz)

@@ -14,6 +14,85 @@ falsifier it was exposed to; three fired, and their firings are reported as
 findings. Every number traces to a seeded, versioned driver re-executed
 exactly by the released replay harness.
 
+\subsection{Plant, protocol, and information structure}
+Figure~\ref{fig:plantF} defines the experimental object: $N$ agents on taut
+unit cables to a common load, each carrying the shape pair
+$s_j = (\sigma_j, \sigma_{i,j})$, communicating over a graph whose algebraic
+connectivity $\lambda_2$ is a controlled variable (the $C_5$ cycle is the
+default; $K_5$ and the E6 sweep vary it). Figure~\ref{fig:archF} is the
+method pipeline actually executed: per agent, 50\,Hz odometry drives a
+left-invariant propagation of the load-pose estimate through the slaved twist,
+a 20\,Hz cable-direction channel updates the shape, and at every send epoch
+the sheaf-weighted fusion rule transports a $\tau$-stale neighbor estimate
+through the shape-dependent edge map before combining. The information
+boundary is strict and machine-checked: each agent sees its own two sensors,
+its neighbors' stale estimates, and (in pinning cells only) one absolute
+beacon at one agent --- the plant's truth state reaches the estimator only
+through the sensor models. Table~\ref{tab:configF} fixes every constant a
+reimplementation needs; Table~\ref{tab:matrixF} is the executed cell matrix
+of this section.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/tcns_plant.pdf}
+  \caption{The reduced plant and its communication structure: shapes
+  $s_j = (\sigma_j, \sigma_{i,j})$ on taut unit cables; the comms graph
+  (dashed) is a controlled variable --- (a) the $C_5$ default, (b) $K_5$.}
+  \label{fig:plantF}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/tcns_architecture.pdf}
+  \caption{The executed estimator pipeline and its information boundary:
+  local sensing (odometry, cable direction), $\tau$-stale shared estimates
+  transported through $\rho = \mathrm{Ad}_m \circ \pi_L$ with sheaf weights
+  $w_e$, and at most one absolute anchor. Nothing else touches truth
+  (linted).}
+  \label{fig:archF}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Experimental configuration (Tier-1).}
+\label{tab:configF}
+\begin{tabular}{ll}
+\toprule
+plant integrator & RK4 shapes + exact $SE(2)$ load step, $\Delta t = 0.01$\,s
+(E10 sweeps $10\times$) \\
+send epoch $D_c$ & 0.05\,s; $\tau$ grid $\{0.05..1.6\}$ exact on the grid \\
+fusion gain & $\alpha = \kappa D_c$, $\kappa = 2.0$ (record gain) \\
+sensing & odom 50\,Hz (surge noise $0.01{+}0.02|v|$, sway $0.01$, gyro
+$0.2^\circ$/s + bias walk); direction 20\,Hz \\
+maneuver & persistent turn $\eta(t) = 0.15 + 0.10\sin(0.05 t)$ \\
+formations & id-keyed draws, half-arc law matched to the multibody
+attachment rays; broadside margin enforced \\
+metric & all-pairs mean $\|\mathrm{Log}(G_i^{-1}G_j)\|^2$, last 30\% window \\
+runs & E3b production: 1584 (12 formations $\times$ 10 seeds per $\tau$ +
+controls) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Executed cell matrix of this section.}
+\label{tab:matrixF}
+\begin{tabular}{lll}
+\toprule
+cell & varies & falsifier(s) \\
+\midrule
+E1 & anchor on/off & kernel dim $\ne 3$ \\
+E3a + ext & $\tau$, formation, switch-offs & C7a/C8/C13; C15 \\
+E3b & $\tau \times$ arm $\times$ formation $\times$ seed & C7b (\conjtag) \\
+E3c & $\varepsilon$ off-symmetry, robust arm & C9b$'$/C9b/C9c \\
+E2 & $\kappa$, topology, $\|\delta\|$ & C6, C19 \\
+E6 & topology $\times N$ ($\lambda_2$) & C10 (exploratory) \\
+E10 & $\Delta t$ ($10\times$) & CI disjointness \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Gauge structure and pinning (E1; Thm.~\ref{thm:gaugeF}, Cor.~\ref{cor:pinF})}
 On the triangle with generic shapes, the sheaf Laplacian is PSD with
 $\dim\ker L_\mathcal{F} = 3$ and the gauge section
@@ -87,6 +166,28 @@ multibody companion (cross-tier exponent difference $+0.023\,[-0.012,
 sit $5$--$13\times$ and further below --- and the executed null pins the
 harness: shapes frozen and noise off give $D_{ss} \sim 10^{-30}$.
 
+Figure~\ref{fig:dssdist} exposes the \emph{distributions} the fitted exponent
+summarizes, at the reference staleness $\tau = 0.4$: per-run $D_{ss}$ CDFs by
+arm over every seed and formation, and the paper-rule spread across the
+$\tau$ grid. Two facts the summary hides are visible here. First, the arm
+separation is distributional, not just in medians: the paper-rule and
+frozen-shape CDFs do not overlap at any quantile. Second, the seed-and-
+formation spread within an arm ($\sim 3\times$ interquartile) is comparable
+to one $\tau$ octave --- which is exactly why the campaign pre-registered
+seed-paired estimators for the $\varepsilon$-response (below) and why
+unpaired CIs were declared under-powered.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/tcns_dss_dist.pdf}
+  \caption{Behind the fitted exponent: (a) per-run $D_{ss}$ CDFs by arm at
+  $\tau = 0.4$ (1584-run production record); (b) paper-rule spread across
+  seeds/formations per $\tau$. $D_{ss}$ is the stochastic steady-state
+  object [\conjtag{} regime] --- measured, not a test of
+  Thm.~\ref{thm:floorF}.}
+  \label{fig:dssdist}
+\end{figure}
+
 \subsection{Symmetry: two metrics, two exponents (E3c; Cor.~\ref{cor:symF})}
 The amplitude departure from the symmetric class is first-order in
 $\varepsilon$ (measured 1.006; base commutator exactly zero). The closed-loop
@@ -97,7 +198,22 @@ linear-plus-quadratic mixture that the registered single-power model
 mis-specifies (reported per the outcome ladder). The robust
 $\ge 10\times$ suppression falsifier trips ($2.75\times\,[1.94, 3.89]$ under
 20\% jitter and 10\% loss): large symmetric protection is a property of the
-amplitude object only (Fig.~\ref{fig:f5tc}).
+amplitude object only (Fig.~\ref{fig:f5tc}). Figure~\ref{fig:robustF} shows
+the tripping row at run level --- the full generic and symmetric $D_{ss}$
+distributions under the robust arm, whose ratio of medians is the quoted
+$2.75\times$: real, but an order short of the registered $10\times$, and
+explicitly outside protocol class $\mathcal{P}$ (heterogeneous realized
+ages), so it characterizes robustness rather than testing the theorem.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\linewidth]{figures/tcns_robust.pdf}
+  \caption{The C9c trip at run level: generic vs.\ symmetric-class $D_{ss}$
+  under 20\% jitter + 10\% drops (outside class $\mathcal{P}$). Median ratio
+  $2.75\times\,[1.94, 3.89]$ --- protection persists but falls an order short
+  of the registered $10\times$.}
+  \label{fig:robustF}
+\end{figure}
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/f5_symmetry.pdf}
@@ -127,9 +243,39 @@ order left to a restatement.
 The excess exponent is invariant across integrator steps
 $\Delta t \in \{0.001, 0.0025, 0.005, 0.01\}$\,s (all CIs share
 $[1.185, 1.256]$), with the coefficient converging mildly under refinement:
-no exponent above is an artifact of the discretization.
+no exponent above is an artifact of the discretization
+(Fig.~\ref{fig:dtF}).
 
-\subsection{Switch-off ladder}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{figures/tcns_dt_invariance.pdf}
+  \caption{E10: the fitted exponent across a $10\times$ range of integrator
+  steps; all CIs share the green band $[1.185, 1.256]$.}
+  \label{fig:dtF}
+\end{figure}
+
+\subsection{Connectivity and the floor (E6; exploratory)}
+Pre-registered as exploratory (C10, no falsifier): sweeping topology and
+fleet size over cycle/path/star/complete at $N \in \{4, 6, 8\}$, connectivity
+suppresses the floor by up to $5\times$ at moderate staleness, and the
+benefit collapses ($\le 2\times$) at high staleness, with complete graphs the
+most $\tau$-sensitive (Fig.~\ref{fig:topoF}). Read forward, this is a design
+observation: buying links buys floor suppression only while the staleness is
+moderate --- at high $\tau$ every topology pays the same curvature price. The
+anchoring-side counterpart (whether connectivity buys \emph{pin-rate}) is a
+multibody question and is answered negatively in the companion.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/tcns_topology.pdf}
+  \caption{E6 (exploratory, C10): floor vs.\ topology$\times N$ ordered by
+  $\lambda_2$, at moderate ($\tau{=}0.2$) and high ($\tau{=}0.8$) staleness.
+  Connectivity suppresses the floor $5\times$ at moderate $\tau$; the benefit
+  collapses at high $\tau$.}
+  \label{fig:topoF}
+\end{figure}
+
+\subsection{Switch-off ladder and the transport-rule ablation}
 \begin{table}[t]
 \centering
 \caption{Switch-off ladder (Tier-1 rows). Each arm kills the effect on
@@ -150,9 +296,107 @@ frozen shapes, closed loop & null & $D_{ss} \sim 10^{-30}$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Reproducibility}
+Figure~\ref{fig:ladderF} adds the closed-loop transport-rule ablation
+(E3b arms) as median $D_{ss}$ per arm and staleness, and it contains a
+finding we flag rather than smooth over: on \emph{this} plant, the A1
+(no-$\mathrm{Ad}$) ablation sits \emph{below} the paper rule on $D_{ss}$ ---
+the ordering inverts relative to the multibody plant, where the transport
+ablations degrade correctness $1.7$--$8.2\times$. The resolution is the
+metric, not the rule: $D_{ss}$ is a \emph{disagreement} functional, and
+agreement is purchasable by groupthink; it never ranks rules. Rule ranking
+belongs to correctness metrics against truth, which exist only on the
+companion's plant, where the ordering is clean. We show the inversion because
+suppressing it would misrepresent what $D_{ss}$ measures.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/tcns_ladder_bars.pdf}
+  \caption{E3b transport-rule and control arms, median $D_{ss}$ by staleness
+  [\conjtag{} object]. The Tier-1 A1-below-paper inversion is shown, not
+  smoothed: $D_{ss}$ is a disagreement metric and never ranks rules ---
+  ranking is done on the companion's truth-referenced metrics. The
+  noise-off frozen null ($D_{ss} \sim 10^{-30}$) lies 27 orders below the
+  axis and is reported in the table.}
+  \label{fig:ladderF}
+\end{figure}
+
+\subsection{The adjudicated ledger, in one figure}
+Figure~\ref{fig:forestF} renders every pre-registered Tier-1 falsifier with
+its registered reference and its verdict --- the section's statistical
+integrity statement. The proved chain's rows (C7a slope, C9b$'$, C6, E10)
+are green; the \conjtag{} regime's rows are red where the falsifier fired
+(C7b, C9b, C9c), exactly as reported in the subsections above; C19 is orange:
+tripped in the favorable direction. Nothing is restated as a pass, and the
+one-axis view makes the epistemic split of the paper visible at a glance:
+the theorem's objects survive every registered attack; the conjectured
+stochastic extension does not, and is reported as measured.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/t1_falsifier_forest.pdf}
+  \caption{The complete Tier-1 falsifier ledger, verdicts as adjudicated:
+  green passed, red falsified/met (\conjtag{} rows --- measured slopes
+  reported as measured), orange tripped favorably. Grey marks the registered
+  references; the evidence record is named per row.}
+  \label{fig:forestF}
+\end{figure}
+
+\subsection{Supplementary movies}
+Three supplementary movies accompany this section; each is generated by a
+seeded, versioned script from the same estimator code as the campaign.
+\emph{M1 (gauge\_drift.mp4)} --- the E1 phenomenon: three agents fuse without
+an anchor, remain mutually consistent, and drift \emph{as a group} along the
+$SE(2)$ gauge; a beacon at one agent collapses the gauge and all three snap
+to truth. The two curves it traces --- disagreement vs.\ truth error --- are
+the two different objects this paper refuses to conflate.
+\emph{M2 (contraction.mp4)} --- the E2 mechanism: identical step
+perturbations decaying under $C_5$ and $K_5$ side by side; per-agent
+gauge-complement errors shrink toward consensus at rates ordered by
+$\kappa\lambda_2$ (C6's tested prediction; LTV/frozen hedge carried
+on-screen).
+\emph{M3 (floor\_protocol.mp4)} --- the E3b \emph{protocol}: the reduced
+plant executes the persistent turn while $D(t)$ for two stalenesses rises to
+its steady state inside the declared evaluation window. The on-screen caption
+carries the registry hedge verbatim: $D_{ss}$ is measured in the
+[\conjtag{}] regime; the movie demonstrates the protocol and is not a test
+of Thm.~\ref{thm:floorF}.
+
+\subsection{Reproducibility and artifact registry}
 Every number in this section traces to a seeded, versioned driver and a
 committed record; the released \texttt{campaign\_replay.py} re-executes
-per-run probes that must match the records exactly (Tier-1 to $10^{-9}$). The
-multibody campaign, its falsifications, and the cross-tier equivalence tests
-appear in the RA-L companion.
+per-run probes that must match the records exactly (Tier-1 to $10^{-9}$).
+Table~\ref{tab:registryF} is the executed registry: cell, driver, committed
+record, and probe class. The figure generator
+(\texttt{tier1\_sheaf/campaign/paper\_artifacts.py}) re-derives the
+extension datasets seed-exactly at import and refuses to plot on mismatch,
+so the figures cannot drift from the records. The multibody campaign, its
+falsifications, and the cross-tier equivalence tests appear in the RA-L
+companion.
+
+\begin{table}[t]
+\centering
+\caption{Experiment registry (cell $\to$ driver $\to$ record $\to$ probe).}
+\label{tab:registryF}
+\begin{tabular}{llll}
+\toprule
+cell & driver (\texttt{tier1\_sheaf/}) & record & probe \\
+\midrule
+E1 & \texttt{experiments/e1\_gauge.py} & \texttt{e1\_gauge.csv} & exact \\
+E3a & \texttt{experiments/e3a\_amplitude.py} & \texttt{e3a\_amplitude.csv} &
+exact \\
+E3a-ext & \texttt{campaign/e3a\_extension.py} & \texttt{e3a\_extension.json} &
+exact \\
+E3b & \texttt{campaign/e3b\_production.py} & \texttt{e3b\_production.json}
+(1584) & exact \\
+E3c & \texttt{experiments/e3c\_symmetry.py} + \texttt{campaign/e3c\_c9b\_v2.py}
+& \texttt{e3c\_*.json} & exact \\
+E2 & \texttt{experiments/e2\_contraction.py} & \texttt{e2\_contraction.json} &
+stat \\
+E6 & \texttt{campaign/e6\_topology.py} & \texttt{e6\_topology.json} & exact \\
+E10 & \texttt{campaign/e10\_dt\_sweep.py} & \texttt{e10\_dt\_sweep.json} &
+exact \\
+movies & \texttt{campaign/*\_movie.py}, \texttt{experiments/anim\_gauge.py} &
+\texttt{*.mp4} & seeded \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -48,6 +48,32 @@ The round trip (one edge, both ways) is the natural object because first-order
 transport terms cancel in any closed walk, exposing the geometric
 (curvature-generated) obstruction as the leading survivor.
 
+Figure~\ref{fig:schematic} fixes the geometry and the object of study before
+any formalism: panel~(a) is the problem-definition and notation diagram ---
+the load pose $G \in SE(2)$ with its body frame $(x_L, y_L)$, one agent's taut
+cable of length $l$, and the two coordinates of that agent's \emph{shape}
+$s = (\sigma, \sigma_i)$: the cable's direction measured at the load (from
+$x_L$) and measured at the vessel (from its hull axis). These two angles are
+the only geometry the theory needs, and they are exactly what each agent can
+sense locally. Panel~(b) is the mathematical mechanism in one picture: a
+reference frame carried around the four-leg loop $e^{\tau C_i} e^{\tau C_j}
+e^{-\tau C_i} e^{-\tau C_j}$ returns displaced; the closing defect (red)
+\emph{is} the holonomy, and the theorem says its magnitude is
+$\tau^2\|[C_i,C_j]\|$ to leading order.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_schematic.pdf}
+  \caption{(a)~Problem definition and notation: load pose $G$, cable length
+  $l$, and the shape pair $s=(\sigma,\sigma_i)$ --- the cable direction in the
+  load frame and in the vessel frame. The trivialization
+  $m(\sigma,\sigma_i)$ (Lemma~\ref{lem:m}) is built from exactly these
+  quantities. (b)~The mechanism: transporting a frame around the stale
+  round-trip loop leaves a closing defect (red) --- the error-transport
+  holonomy, $\tau^2[C_i,C_j]+O(\tau^3)$.}
+  \label{fig:schematic}
+\end{figure}
+
 \section{Setting and main result}
 Let $g_L \in SE(2)$ be the load pose and $s_j = (\sigma, \sigma_i)$ agent
 $j$'s shape pair (cable direction in the load and body frames).
@@ -118,6 +144,79 @@ shapes give a strictly positive coefficient. \provtag
 
 
 \section{Construction and proof architecture}
+Figure~\ref{fig:thmmap} shows the statement-dependency map and doubles as the
+proof roadmap: the trivialization (Lemma~\ref{lem:m}) and the shape-only edge
+maps feed the estimation-sheaf construction; the BCH collection lemma
+(Lemma~\ref{lem:bch}) and the sheaf feed the floor theorem
+(Theorem~\ref{thm:floor}); the symmetry corollary
+(Corollary~\ref{cor:sym}) hangs off the theorem. The one dashed, red node ---
+the stochastic steady-state floor with sharp constants --- is the only
+\conjtag{} element in the map, and it is \emph{outside} the chain this letter
+proves: everything used by the theorem is solid green. Keeping that node in
+the map, rather than omitting it, is deliberate: it marks the exact boundary
+where Section~\ref{sec:notclaim} takes over. Table~\ref{tab:notation}
+collects the symbols; Table~\ref{tab:assume} states each assumption, its
+mathematical role, and how the experiments check it --- including what
+happens when it is violated, which is precisely the switch-off ladder.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{theorem_map.pdf}
+  \caption{Statement-dependency map and proof roadmap. Solid green =
+  \provtag{} (proved, with the proof or sketch in this letter); grey = the
+  sheaf construction (definitions); dashed red = the \conjtag{} stochastic
+  steady-state object, deliberately shown \emph{outside} the proved chain ---
+  it is the boundary discussed in Sec.~\ref{sec:notclaim}, not a dependency
+  of the theorem.}
+  \label{fig:thmmap}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Notation.}
+\label{tab:notation}
+\begin{tabular}{lll}
+\toprule
+symbol & meaning & domain/units \\
+\midrule
+$g_L, G$ & load pose & $SE(2)$ \\
+$s_j = (\sigma, \sigma_i)$ & agent $j$'s shape pair & rad $\times$ rad \\
+$l$ & cable length & m (unit in Tier-1) \\
+$m(s)$ & constraint trivialization & $SE(2)$ \\
+$\xi = (v, 0, \eta)$ & common load twist & $\mathfrak{se}(2)$ \\
+$\eta$ & load turn rate & rad/s \\
+$\tau$ & staleness (lag) of fused packets & s \\
+$C_j(s_j;\xi)$ & conjugated error-transport generator & $3{\times}3$ \\
+$\mathrm{Hol}(\gamma_c)$ & holonomy of the lagged loop $\gamma_c$ & $SE(2)$ \\
+$D_{ss}$ & steady-state disagreement (\conjtag{} regime) & m$^2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Assumptions: role, how checked, and consequence when violated.}
+\label{tab:assume}
+\begin{tabular}{p{1.7cm}p{2.6cm}p{3.4cm}}
+\toprule
+assumption & mathematical role & checked by / violated \\
+\midrule
+taut cable, length $l$ & the trivialization $m(s)$ exists & broadside margin
+$|\cos\sigma_i| > 0.1$ enforced in every draw; near broadside the reduced
+plant leaves its validity domain (companion, \S VI) \\
+common twist $\xi \ne 0$ & generates the transports $e^{\tau C_j}$ &
+switch-off arm $\xi = 0$: holonomy $= 0.0$ exactly \\
+persistent turn $\eta \ne 0$ & leading commutator $\propto \eta$ &
+switch-off arm $\eta = 0$: machine zero ($<10^{-17}$) \\
+uniform lag $\tau$ on the cycle & the frozen-generator BCH collection &
+protocol class $\mathcal{P}$ asserts realized age $\equiv \tau$ per fuse;
+jitter/drop arms are declared outside $\mathcal{P}$ \\
+distinct shapes & $[C_i, C_j] \ne 0$ & coincident and, more generally,
+level-set pairs cancel exactly (Fig.~\ref{fig:heatmap}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Conventions and the constraint trivialization}
 On $SE(2)$, $\mathrm{Exp}(\xi) = (R(\omega), V(\omega)v)$ for
 $\xi = (v,\omega)$ with the standard closed-form $V$, and
@@ -213,6 +312,90 @@ symmetry class of Corollary~\ref{cor:sym} extends from coincident shapes to
 conjugation-equivalent ones. (Stated as a numerical observation; a commutant
 argument suggests it, and a proof is left to the companion.)
 
+Figure~\ref{fig:heatmap} resolves the \emph{global} structure of this
+protected class. Fixing the reference at the first discovered pair's first
+shape and mapping $\|[C(s_{\mathrm{ref}}), C(s)]\|$ over the whole shape
+torus $[-\pi,\pi]^2$, a basin-polished exhaustive scan finds \emph{exactly
+two} zeros: $s_{\mathrm{ref}}$ itself and one isolated partner 1.057\,rad
+away --- the very partner the pre-registered C15 search discovered --- at
+which the generator \emph{equals} $C_{\mathrm{ref}}$ (search
+tolerance-limited here; the registered search resolved the same pair to
+$10^{-16}$). The level set is therefore \emph{discrete} at this $\xi$: each
+shape has an isolated conjugation twin, not a continuous curve of them, and
+nowhere on the torus does the commutator vanish without the generators
+coinciding. This sharpens the observation: protection is all-or-nothing in
+shape space, and the ``valley'' visible in the heatmap is a finite-depth
+saddle everywhere except at the two exact zeros.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{lcss_commutator_heatmap.pdf}
+  \caption{The protected class, globally.
+  $\log_{10}\|[C(s_{\mathrm{ref}}), C(s)]\|$ over the shape torus, with
+  $s_{\mathrm{ref}}$ the first C15 pair's first shape (star). An exhaustive
+  basin-polished scan finds exactly two zeros: the reference and one isolated
+  level partner (circle, 1.057\,rad away) with $C = C_{\mathrm{ref}}$ ---
+  the discrete level set on which holonomy protection is exact at all
+  orders.}
+  \label{fig:heatmap}
+\end{figure}
+
+Three further statistical and boundary artifacts complete the evidence
+around the theorem. Figure~\ref{fig:remstats} gives the full
+\emph{distributions} behind the summary numbers of arms (i)--(ii): the
+empirical CDF of the per-draw remainder constant over all 220 draws (median,
+95th percentile, and supremum marked --- the quoted 0.0133 is the worst
+case, not a typical one), and the histogram of the 20 per-formation fitted
+slopes, whose entire support spans $3\times10^{-13}$ around 1.9993.
+Figure~\ref{fig:bound} tests the leading-order \emph{prediction} rather
+than the fit: measured $\|\mathrm{Log\,Hol}\|$ against the predicted
+$\tau^2\|[C_i,C_j]\|$ for 60 draws at four stalenesses collapses onto the
+identity line (panel a), and the measured-to-predicted ratio rises to 1
+as $\tau \to 0$ with a 5--95\% band narrower than $2\times10^{-4}$
+(panel b): the theorem's constant is not just consistent with the data ---
+it \emph{is} the data, to the width of the $O(\tau^3)$ remainder.
+Figure~\ref{fig:domain} then shows where the leading order \emph{stops}
+describing: extending $\tau$ an order of magnitude beyond the operating grid,
+the measured amplitude departs from the $\tau^2$ law by 10\% only at
+$\tau \approx 10$; inside the pre-registered grid ($\tau \le 1.6$) the
+relative departure never exceeds $3.4\times10^{-3}$. Two exploratory
+observations accompany the figure, stated as observations: the
+\emph{relative} departure is pair-independent (identical to three digits
+across unrelated shape pairs --- the $O(\tau^3)$ structure appears to scale
+with the same commutator as the leading term), and the theorem's small-$\tau$
+domain is therefore far larger than the operating regime needs.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_remainder_stats.pdf}
+  \caption{Distributions behind the summary numbers. (a)~Empirical CDF of
+  the per-draw remainder constant $\sup_\tau \|R\|/\tau^3$ over 220 shape
+  draws; the quoted 0.0133 is the supremum. (b)~All 20 per-formation
+  slopes: support width $3\times10^{-13}$.}
+  \label{fig:remstats}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_bound_tightness.pdf}
+  \caption{Bound tightness. (a)~Measured amplitude vs.\ the leading-order
+  prediction $\tau^2\|[C_i,C_j]\|$, 60 draws $\times$ 4 stalenesses, on the
+  identity line. (b)~Measured/predicted ratio $\to 1$ as $\tau \to 0$;
+  the 5--95\% band across draws is narrower than $2\times10^{-4}$.}
+  \label{fig:bound}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\linewidth]{lcss_domain_boundary.pdf}
+  \caption{Outside the leading-order domain: the measured amplitude departs
+  from the $\tau^2$ law by 10\% only at $\tau \approx 10$ --- an order of
+  magnitude beyond the operating grid ($\tau \le 1.6$), where the relative
+  departure stays below $3.4\times10^{-3}$. The theorem is a small-$\tau$
+  statement and this is its measured boundary.}
+  \label{fig:domain}
+\end{figure}
+
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{e3a_extension_panels.pdf}
@@ -267,7 +450,7 @@ switch-off at machine zero, and a $31\times$ coefficient suppression for the
 achieved-$\varepsilon$ symmetric class (exact cancellation remains the analytic
 result) — the theorem's object survives on states it was never derived from.
 
-\section{What the theorem does not claim}
+\section{What the theorem does not claim}\label{sec:notclaim}
 The stochastic steady-state disagreement floor of the noisy closed loop is a
 \emph{different} object, conjectured in the companion theory. Companion
 experiments on two independent plants measure its staleness exponent at
@@ -275,6 +458,36 @@ $1.08$--$1.10$ (cross-tier equivalent; the conjectured order 2 excluded), with
 the $\tau^2$ object resolved only noise-free: at realistic sensor noise the
 closed loop is dominated by first-order estimate mismatch. We state this
 boundary here so the theorem is cited for what it proves.
+
+Figure~\ref{fig:forest} shows the entire pre-registered Tier-1 falsifier
+ledger as adjudicated --- passes and failures on one axis, none dressed. The
+top block is this letter's chain: amplitude slope, symmetric-class
+$\varepsilon$-exponent, contraction slope, and $\Delta t$-invariance, all
+green against their registered references. The bottom block is the
+\conjtag{} regime: the closed-loop $D_{ss}$ exponent (falsified against the
+conjectured order 2 at these scales --- the CI $[1.076, 1.125]$ also excludes
+1, so the measured slope is reported as measured, not asserted as a law), the
+seed-paired $\varepsilon$-exponent (falsifier condition met; the registered
+single-power model is mis-specified for the evident mixture), and the robust
+suppression factor ($2.75\times$, short of the registered $10\times$: the
+protection is an amplitude-object property, degraded outside the uniform-delay
+protocol class). The C19 remainder row tripped in the \emph{favorable}
+direction --- the remainder vanishes faster than registered --- and is drawn
+orange, as tripped, not green. This figure is the letter's statistical
+integrity statement: the reader can see what was bet, what was won, and what
+was lost.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{t1_falsifier_forest.pdf}
+  \caption{The complete Tier-1 falsifier ledger, verdicts as registered.
+  Green = passed; red = falsified / falsifier met (\conjtag{} rows ---
+  measured slopes reported as measured, no law asserted); orange = tripped
+  favorably (C19: the remainder vanishes \emph{faster} than the registered
+  second order). Grey dashes and bands are the registered references and
+  thresholds; evidence file named per row.}
+  \label{fig:forest}
+\end{figure}
 
 \section{Contribution, deduced}
 The chain closes as follows. Lemma~\ref{lem:m} makes decentralized load
@@ -295,10 +508,113 @@ mechanism to the noisy closed loop is measurably false at realistic noise,
 where first-order estimate mismatch dominates. The theorem is cited for what
 it proves; the boundary is part of the result.
 
+Table~\ref{tab:corr} closes the loop between statements and evidence: every
+claim in the theorem chain is mapped to its assumptions, its measurement, its
+figure, and its outcome. No claim in this letter lacks a row.
+
+\begin{table}[t]
+\centering
+\caption{Theorem-to-experiment correspondence.}
+\label{tab:corr}
+\begin{tabular}{p{2.0cm}p{1.6cm}p{1.9cm}p{1.6cm}}
+\toprule
+claim & measurement & figure/table & outcome \\
+\midrule
+order 2 (Thm~\ref{thm:floor}) & log--log slope, 6 $\tau$ & Fig.~\ref{fig:e3a},
+\ref{fig:ext}a & 1.999 / 2.000 both plants \\
+coefficient 1 ($m{=}2$) & ratio at small $\tau$ & Fig.~\ref{fig:e3a},
+\ref{fig:bound} & 1.0000 \\
+null: $s_i{=}s_j$ (Cor.~\ref{cor:sym}) & switch-off arm & ladder table &
+$<10^{-15}$ \\
+null: $\eta{=}0$ & switch-off arm & ladder table & $<10^{-17}$ \\
+null: $\xi{=}0$ & switch-off arm & ladder table & exactly $0.0$ \\
+null: $\tau{=}0$ & explicit arm & Sec.~III-E(iii) & exactly $0.0$ \\
+$O(\tau^3)$ uniform & 220-draw sup & Fig.~\ref{fig:remstats} & $\le 0.0133$ \\
+level-set class & C15 search + torus scan & Fig.~\ref{fig:heatmap} & discrete;
+exact protection \\
+domain boundary & large-$\tau$ arm & Fig.~\ref{fig:domain} & 10\% at
+$\tau{\approx}10$ \\
+$D_{ss}$ (\conjtag) & companion E3b & Fig.~\ref{fig:forest} & falsified at
+these scales \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Supplementary movies}
+Three supplementary movies accompany the letter; each is generated by a
+seeded, versioned script and each carries a distinct piece of the argument.
+
+\emph{S1 (holonomy\_loop.mp4).} The mechanism itself: a reference frame is
+carried around the four-leg loop $e^{\tau C_i} e^{\tau C_j} e^{-\tau C_i}
+e^{-\tau C_j}$ as $\tau$ grows from 0.02 to 1.6\,s. The loop visibly fails to
+close; the closing gap is the holonomy, and the side panel traces its
+amplitude along the $\tau^2$ law. (Playback: 20\,fps; the on-screen $\tau$
+and gap are printed each frame.)
+
+\emph{S2 (level\_set.mp4).} The discovery of arm (iv) as a side-by-side
+comparison under identical protocol: left, a generic pair --- the loop opens
+quadratically; right, the discovered level-set pair 1.06\,rad apart --- the
+loop closes to $10^{-16}$ at \emph{every} $\tau$, with both amplitude traces
+running below. One movie, two behaviors, one changed variable: the
+commutator.
+
+\emph{S3 (formation\_sweep.mp4).} Formation invariance as a sweep: the exact
+20-formation draw sequence of the campaign (replayed seed-exact and asserted
+against the persisted record) is shown formation by formation --- geometry,
+per-formation fit, and the slope strip collapsing onto $1.9993$ with spread
+$10^{-13}$. The order is structural; the geometry moves only the
+coefficient.
+
+\section{Research-artifact package}
+Beyond the figures and movies above, the letter ships as a structured
+evidence package; every item is generated by committed code from committed
+records.
+\emph{Conceptual}: the problem/notation schematic and mechanism diagram
+(Fig.~\ref{fig:schematic}), the statement-dependency map
+(Fig.~\ref{fig:thmmap}). \emph{Formal}: notation
+(Table~\ref{tab:notation}), assumptions with violation consequences
+(Table~\ref{tab:assume}), theorem-to-experiment correspondence
+(Table~\ref{tab:corr}). \emph{Quantitative}: the amplitude law
+(Fig.~\ref{fig:e3a}), extension panels (Fig.~\ref{fig:ext}), remainder
+distributions (Fig.~\ref{fig:remstats}), bound tightness
+(Fig.~\ref{fig:bound}), domain boundary (Fig.~\ref{fig:domain}), the global
+level-set map (Fig.~\ref{fig:heatmap}), the switch-off ladder (table), and
+the adjudicated falsifier ledger (Fig.~\ref{fig:forest}). \emph{Multimedia}:
+movies S1--S3 with per-frame quantitative overlays. \emph{Reproducibility}:
+Table~\ref{tab:repro} inventories the executable artifacts.
+
+\begin{table}[t]
+\centering
+\caption{Reproducibility inventory (companion repository).}
+\label{tab:repro}
+\begin{tabular}{p{2.6cm}p{4.6cm}}
+\toprule
+artifact & source / regeneration \\
+\midrule
+campaign records & \texttt{tier1\_sheaf/results/*.json,csv} (committed) \\
+figure generator & \texttt{tier1\_sheaf/campaign/paper\_artifacts.py}
+(replays the draw sequence seed-exact and \emph{asserts} it against the
+committed record before plotting) \\
+movie generators & \texttt{holonomy\_movie.py}, \texttt{level\_set\_movie.py},
+\texttt{formation\_sweep\_movie.py} (seeded, deterministic) \\
+extension driver & \texttt{tier1\_sheaf/campaign/e3a\_extension.py}
+(seed 2026; wrote the committed record) \\
+replay harness & \texttt{campaign\_replay.py}: per-cell probes must match
+committed records to $10^{-9}$ (exact class) \\
+environment & \texttt{requirements.lock.txt} (pinned); no GPU required \\
+seeds & every driver embeds its seeds; formation draws are id-keyed \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Reproducibility}
 Every number above traces to a seeded, versioned driver;
 \texttt{campaign\_replay.py} in the companion repository re-executes per-run
-probes that must match committed records exactly.
+probes that must match committed records exactly. The figure generator for
+this letter additionally \emph{re-derives} the 20-formation and 220-draw
+datasets at import time and refuses to plot if they do not match the
+committed campaign record to $10^{-12}$ --- the figures cannot silently
+drift from the data.
 
 %% AUTHOR: acknowledgments, refs.
 \bibliographystyle{IEEEtran}
