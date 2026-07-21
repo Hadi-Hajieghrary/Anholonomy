@@ -169,13 +169,61 @@ verifies); no experiment below assumes them.
 
 \subsection{Measurement protocol}
 The amplitude is measured as $\|\mathrm{Log\,Hol}\|$ with dense matrix
-exponentials/logarithms (no leading-order shortcut), so the fitted slope and
+exponentials/logarithms (no leading-order shortcut), over
+$\tau \in \{0.05, 0.1, 0.2, 0.4, 0.8, 1.6\}$\,s, so the fitted slope and
 the coefficient ratio $\|\mathrm{Log\,Hol}\|/\tau^2\|[C_i,C_j]\|$ are
 independent checks: the former tests the order, the latter the constant. The
-$\tau$-dependence of $\mathrm{Hol}$ is analytic once the generators are fixed;
-the measured content of the verification is therefore the coefficient, the
-switch-offs, and the $O(\tau^3)$ departure at the top of the grid --- stated
-so the slope itself is never presented as an independent discovery.
+$\tau$-dependence of $\mathrm{Hol}$ is analytic once the generators are
+fixed; the measured content is therefore the coefficient, the switch-offs, and
+the $O(\tau^3)$ departure --- stated so the slope itself is never presented as
+an independent discovery. A supplementary animation (S1) carries the loop
+$e^{\tau C_i} e^{\tau C_j} e^{-\tau C_i} e^{-\tau C_j}$ applied to a
+reference frame: the visible failure of the loop to close \emph{is} the
+holonomy, growing quadratically alongside the traced amplitude law.
+
+\subsection{Extension experiments}
+Four further pre-registered arms complete the verification
+(Fig.~\ref{fig:ext}).
+
+\emph{(i) Formation invariance of the order.} Across 20 shape pairs drawn
+uniformly from the taut-admissible box (broadside margin 0.10), the fitted
+slope is $1.9993 \pm 0.0000$ (range $[1.9993, 1.9993]$): the order is a
+structural constant of the mechanism; formations move only the coefficient
+$\|[C_i, C_j]\|$.
+
+\emph{(ii) Uniform remainder constant.} Over 220 shape draws,
+$\sup_\tau \|\mathrm{Log\,Hol} - \tau^2 [C_i, C_j]\| / \tau^3 \le
+0.0133$ (95th percentile 0.011, median 0.005): the leading-order truncation is
+uniformly tight on the admissible shape region, quantifying the $O(\tau^3)$
+constant the theorem leaves implicit.
+
+\emph{(iii) Explicit $\tau = 0$ arm.} $\|\mathrm{Log\,Hol}\| = 0.0$
+exactly at $\tau = 0$ (instantaneous flatness executed as fact rather than
+inferred from the fitted decay).
+
+\emph{(iv) The protected class is a level set (observed).} A numerical search
+for zero-commutator pairs with shapes separated by $\ge 1$\,rad found five;
+at every one, the generators themselves coincide,
+$\|C_i - C_j\| \sim 10^{-16}$, and the \emph{full} holonomy vanishes at
+machine zero for all $\tau$ --- all orders, not merely the leading term. We
+therefore observe that at $m = 2$ with a common load twist,
+$[C_i, C_j] = 0$ occurs only on the level set $\{s : C(s;\xi) =
+\mathrm{const}\}$, where protection is exact rather than $O(\tau^3)$: the
+symmetry class of Corollary~\ref{cor:sym} extends from coincident shapes to
+conjugation-equivalent ones. (Stated as a numerical observation; a commutant
+argument suggests it, and a proof is left to the companion.)
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{e3a_extension_panels.pdf}
+  \caption{Extension arms. (a)~Slope across 20 random taut formations:
+  $1.9993 \pm 0.0000$ --- formation-invariant. (b)~Remainder constant over
+  220 draws: uniformly tight $O(\tau^3)$ truncation. (c)~Zero-commutator
+  pairs at $\ge 1$\,rad separation all satisfy $C_i = C_j$ to $10^{-16}$:
+  the protected class is a level set. (d)~Coefficient ratio $\to 1$ as
+  $\tau \to 0$.}
+  \label{fig:ext}
+\end{figure}
 
 \section{The measured object}
 The $m{=}2$ round trip composes one edge's error transport both ways:

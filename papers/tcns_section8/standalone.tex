@@ -1,0 +1,22 @@
+% standalone preview wrapper for section8.tex (the flagship \input's the section)
+\documentclass[letterpaper, 10pt, journal]{IEEEtran}
+\usepackage{graphicx, amsmath, amssymb, booktabs, amsthm}
+\newtheorem{theorem}{Theorem}\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}\newtheorem{definition}{Definition}
+\newcommand{\provtag}{\textsc{[proven]}}
+\newcommand{\conjtag}{\textsc{[conjectural]}}
+% stand-in labels for the flagship's theorem numbers (resolved when \input
+% into estimation_sheaf.tex; here they render as ??-free placeholders)
+\newcommand{\flagref}[1]{#1}
+\title{T-CNS \S VIII preview: Numerical verification (Tier-1 rendition)}
+\author{Hadi Hajieghrary}
+\begin{document}
+\maketitle
+% define the labels the section references so the preview compiles cleanly
+\makeatletter
+\newcommand{\deflabel}[2]{\protected@write\@auxout{}{\string\newlabel{#1}{{#2}{}}}}
+\makeatother
+\deflabel{thm:gaugeF}{5.1}\deflabel{cor:pinF}{5.2}\deflabel{thm:contractF}{6.3}
+\deflabel{thm:floorF}{7.2}\deflabel{cor:symF}{7.3}
+\input{section8}
+\end{document}
