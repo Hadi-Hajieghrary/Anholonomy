@@ -118,7 +118,7 @@ class EstController(LeafSystem):
     def __init__(self, thrust_nom: float, thrust_ramp: float, k_heading: float,
                  theta_ref: float, theta_a0: float, *, k_cable: float = 100.0,
                  turn_bias: float = 0.0, turn_amp: float = 0.0,
-                 turn_freq: float = 0.05, dogleg=None):
+                 turn_freq: float = 0.05, dogleg=None, decel=None):
         super().__init__()
         self._nom = float(thrust_nom)
         self._ramp = float(thrust_ramp)
@@ -133,6 +133,9 @@ class EstController(LeafSystem):
         # hero transit (plan §7.1 two legs + one 60-deg turn); composes with the
         # persistent-turn terms (normally zero in the hero config)
         self._dogleg = tuple(float(x) for x in dogleg) if dogleg is not None else None
+        # decel = (t_start, duration, factor): docking-approach thrust ramp-down
+        # (hero v2 — physically extends the beacon convergence window)
+        self._decel = tuple(float(x) for x in decel) if decel is not None else None
         self._odom = self.DeclareVectorInputPort("odom", BasicVector(3))
         self._dir = self.DeclareVectorInputPort("direction", BasicVector(2))
         self._state_index = self.DeclareDiscreteState(np.array([theta_a0]))
@@ -158,6 +161,10 @@ class EstController(LeafSystem):
             ref_t += ang * 0.5 * (1.0 - np.cos(np.pi * u))
         err = (ref_t - th_a + np.pi) % (2 * np.pi) - np.pi
         surge = self._nom * min(1.0, t / self._ramp)
+        if self._decel is not None:
+            t0, dur, fac = self._decel
+            u = min(max((t - t0) / dur, 0.0), 1.0)
+            surge *= 1.0 - (1.0 - fac) * 0.5 * (1.0 - np.cos(np.pi * u))
         yaw = self._kh * err + self._kc * np.sin(sig_i)
         output.set_value([surge, yaw])
 

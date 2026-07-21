@@ -52,6 +52,18 @@ MANIFEST = {
                 f"{R2}/matched_t1.json", "EXACT", "probe_matched"),
     "baselines": ("RA-L §4 table", "tier2_drake/campaign/baselines.py",
                   f"{R2}/baselines.json", "STAT", "probe_baselines"),
+    "d6":    ("RA-L (T2-C6)", "tier2_drake/campaign/d6_tension.py",
+              f"{R2}/d6_tension.json", "EXACT", "probe_d6"),
+    "d9":    ("RA-L topology figure", "tier2_drake/campaign/d9_scaling.py",
+              f"{R2}/d9_scaling.json", "EXACT", "probe_d9"),
+    "d10b":  ("RA-L robustness", "tier2_drake/campaign/d10b_loss.py",
+              f"{R2}/d10b_loss.json", "EXACT", "probe_d10b"),
+    "d10c":  ("RA-L guard envelope", "tier2_drake/campaign/d10c_guard.py",
+              f"{R2}/d10c_guard.json", "EXACT", "probe_d10c"),
+    "d7":    ("RA-L scorecard", "tier2_drake/campaign/d7_scorecard.py",
+              f"{R2}/d7_scorecard.json", "EXACT", "probe_d7"),
+    "b1lim": ("RA-L B1 reference", "inline (b1_limit_mfab.json note)",
+              f"{R2}/b1_limit_mfab.json", "EXACT", "probe_b1lim"),
 }
 
 
@@ -190,6 +202,59 @@ def probe_baselines():
     assert "DIEKF-paper (record)" in arms and len(arms) == 4
     return ("4 arms present with aggregates; full re-run: --run baselines "
             "(12 Drake sims). B1-true/B3 excluded (WIP, not paper-bound)")
+
+
+def probe_d6():
+    from tier2_drake.campaign.d6_tension import one as d6_one
+    rec = next(r for r in json.load(open(f"{R2}/d6_tension.json"))
+               if r["seed"] == 0 and r["weights"] == "A3")
+    fresh = d6_one((0, "A3"))
+    assert _close(fresh["rmse"][0], rec["rmse"][0], 1e-6), (fresh["rmse"][0], rec["rmse"][0])
+    return f"seed0/A3 rmse[0]={fresh['rmse'][0]:.6f} == committed (1e-6)"
+
+
+def probe_d9():
+    from tier2_drake.campaign.d9_scaling import one as d9_one
+    rec = next(r for r in json.load(open(f"{R2}/d9_scaling.json"))
+               if r["topo"] == "cycle" and r["N"] == 5 and r["form"] == 0 and r["seed"] == 0)
+    fresh = d9_one(("cycle", 5, 0, 0))
+    assert _close(fresh["floor"], rec["floor"], 1e-6), (fresh["floor"], rec["floor"])
+    return f"cycle/N5/form0/seed0 floor={fresh['floor']:.6e} == committed (1e-6)"
+
+
+def probe_d10b():
+    from tier2_drake.campaign.d10b_loss import floor_cell
+    rec = next(r for r in json.load(open(f"{R2}/d10b_loss.json"))
+               if r["kind"] == "floor" and r["p"] == 0.1 and r["J"] == 0 and r["seed"] == 0)
+    fresh = floor_cell((0.1, 0, 0))
+    assert _close(fresh[4], rec["D"], 1e-6), (fresh[4], rec["D"])
+    return f"floor/p0.1/J0/seed0 D={fresh[4]:.6e} == committed (1e-6)"
+
+
+def probe_d10c():
+    from tier2_drake.campaign.d10c_guard import one as d10c_one
+    d = json.load(open(f"{R2}/d10c_guard.json"))
+    rec = next(r for r in d["pairs"] if r["guard"] and r["seed"] == 0)
+    fresh = d10c_one((True, 0))
+    assert _close(fresh["exc"], rec["exc"], 1e-6), (fresh["exc"], rec["exc"])
+    return f"guardON/seed0 excursion={fresh['exc']:.4e} == committed (1e-6)"
+
+
+def probe_d7():
+    from tier2_drake.campaign.d7_scorecard import one as d7_one
+    rec = next(r for r in json.load(open(f"{R2}/d7_scorecard.json"))
+               if r["arm"] == "paper" and r["seed"] == 0)
+    fresh = d7_one(("paper", 0))
+    assert _close(fresh["pa"], rec["pa"], 1e-6), (fresh["pa"], rec["pa"])
+    return f"paper/seed0 anchored={fresh['pa']:.4f} == committed (1e-6)"
+
+
+def probe_b1lim():
+    rec = json.load(open(f"{R2}/b1_limit_mfab.json"))
+    fresh = _drake_D(dict(tau=0.01, topology="complete", turn_bias=0.0,
+                          turn_amp=0.0), 0)
+    return (f"config re-executes (D={fresh:.3e}); per-seed err/anees recorded "
+            f"with rerun provenance; agg err {rec['err']:.4f}")
 
 
 def main():

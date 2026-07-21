@@ -1,21 +1,102 @@
-% L-CSS floor letter — skeleton. The PROV package: Thm 7.2's object measured.
-% Theory source: author's refs/estimation_sheaf.tex (unversioned). This letter
-% carries E3a (executed): generic slope 1.999, coefficient check 1.0000 at m=2,
-% all switch-offs machine zero (xi=0 literal 0.0) — Q12 satisfied.
+% L-CSS floor letter — draft with all numerics sections complete.
+% Theory-statement blocks marked %% AUTHOR: pull from refs/estimation_sheaf.tex.
 \documentclass[letterpaper, 10pt, journal]{IEEEtran}
-\usepackage{graphicx, amsmath, amssymb}
-\graphicspath{{../../tier1_sheaf/results/}}
-\title{A Latency--Curvature Floor for Distributed Estimation\\ under Constraint-Induced Sheaf Fusion}
+\usepackage{graphicx, amsmath, amssymb, booktabs}
+\graphicspath{{../../tier1_sheaf/results/}{../../tier2_drake/results/s1/}}
+
+\title{A Latency--Curvature Floor for Distributed Estimation\\
+under Constraint-Induced Sheaf Fusion}
 \author{Hadi Hajieghrary}
+
 \begin{document}
 \maketitle
+
 \begin{abstract}
-% Letter scope: the leading-order deterministic holonomy amplitude (PROV) with
-% its measured verification: slope, coefficient, switch-off ladder. The
-% stochastic steady-state floor is stated as conjectured ([ES §10(ii)]) with a
-% forward pointer to the companion papers.
+When cooperating agents fuse delayed estimates through shape-dependent
+transports, the round-trip composition of stale transport maps acquires a
+holonomy. We prove that, to leading order in the staleness $\tau$, the
+error-transport holonomy amplitude obeys $\|\mathrm{Log\,Hol}\| =
+\tau^2\,\|[C_i,C_j]\| + O(\tau^3)$, with $C_j$ the shape-conjugated error
+generators, vanishing identically under each of the theorem's hypotheses'
+negations ($\eta=0$, $\xi=0$, coincident shapes). We verify the result
+numerically to coefficient precision: fitted slope 1.999 on the analytic
+construction with all switch-offs at machine zero, and slope 2.000 with the
+$m{=}2$ coefficient ratio $1.0000$ when the generators are built from the
+closed-loop states of an independent multibody simulation. The stochastic
+steady-state floor of the closed loop is a distinct, conjectured object;
+companion work measures its scaling and finds it first-order-dominated at
+realistic noise, an order separation we state here as the boundary of the
+theorem's claim.
 \end{abstract}
-% Sections: I theorem + hedge; II the m=2 construction; III E3a verification
-% (fig: e3a_amplitude.png; table: switch-off ladder, tier-tagged rows);
-% IV conjecture statement + pointer. Reproducibility: campaign_replay.py.
+
+\section{Introduction}
+%% AUTHOR: motivation from estimation_sheaf.tex §1 — cable-coupled multi-agent
+%% estimation; the constraint channel; delayed fusion through shape-conjugated
+%% transports. One paragraph on why the ROUND TRIP is the natural object.
+
+\section{Setting and main result}
+%% AUTHOR: Thm 7.2 statement verbatim with its tag:
+%% [Proved here] "(leading order, deterministic; sharp constants and the
+%% stochastic steady-state floor: [Conjectural])" — the hedge is load-bearing.
+%% Lem 7.1 (BCH) supporting statement.
+
+\section{The measured object}
+The $m{=}2$ round trip composes one edge's error transport both ways:
+$\mathrm{Hol} = e^{\tau C_i} e^{\tau C_j} e^{-\tau C_i} e^{-\tau C_j}$, with
+$C_j = \mathrm{Ad}_{m(s_j)}\,\mathrm{ad}_\xi\,\mathrm{Ad}_{m(s_j)}^{-1}$.
+Lemma~7.1 gives $\mathrm{Log\,Hol} = \tau^2 [C_i, C_j] + O(\tau^3)$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{e3a_amplitude.png}
+  \caption{Measured $\|\mathrm{Log\,Hol}\|$ vs.\ $\tau$ (analytic shapes).
+  Generic pair: fitted slope $1.999$ over $\tau \in [0.05, 1.6]$\,s; the
+  coefficient ratio $\|\mathrm{Log\,Hol}\|/\tau^2\|[C_i,C_j]\| = 1.0000$ at
+  the smallest $\tau$. Switch-off arms ($s_i{=}s_j$; $\eta{=}0$; $\xi{=}0$)
+  sit at machine zero ($\xi{=}0$ literally $0.0$) — the effect dies exactly
+  when the theorem requires it to.}
+  \label{fig:e3a}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Switch-off ladder (Tier-1 rows; executed values).}
+\begin{tabular}{lcc}
+\toprule
+arm & prediction & measured \\
+\midrule
+generic slope & $2$ & $1.999$ \\
+coefficient ratio ($m{=}2$) & $1$ & $1.0000$ \\
+$s_i \equiv s_j$ & $0$ & $<10^{-15}$ \\
+$\eta = 0$ & $0$ & $<10^{-17}$ \\
+$\xi = 0$ & $0$ & $0.0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Independent-plant check.} Building the same generators from the
+closed-loop shape and twist \emph{estimates} of a physics-complete multibody
+simulation (Drake; SAP contact; 12\,m distance-constraint cables; five-vessel
+pentagon tow) gives slope $2.000$, coefficient ratio $1.0000$, the $\eta{=}0$
+switch-off at machine zero, and a $31\times$ coefficient suppression for the
+achieved-$\varepsilon$ symmetric class (exact cancellation remains the analytic
+result) — the theorem's object survives on states it was never derived from.
+
+\section{What the theorem does not claim}
+The stochastic steady-state disagreement floor of the noisy closed loop is a
+\emph{different} object, conjectured in the companion theory. Companion
+experiments on two independent plants measure its staleness exponent at
+$1.08$--$1.10$ (cross-tier equivalent; the conjectured order 2 excluded), with
+the $\tau^2$ object resolved only noise-free: at realistic sensor noise the
+closed loop is dominated by first-order estimate mismatch. We state this
+boundary here so the theorem is cited for what it proves.
+
+\section{Reproducibility}
+Every number above traces to a seeded, versioned driver;
+\texttt{campaign\_replay.py} in the companion repository re-executes per-run
+probes that must match committed records exactly.
+
+%% AUTHOR: acknowledgments, refs.
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
 \end{document}

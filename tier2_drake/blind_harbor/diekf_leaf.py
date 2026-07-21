@@ -33,7 +33,11 @@ class DIEKFSigmaLeaf(LeafSystem):
                  covariance: str = "ci", weights: str = "A3",
                  send_epoch: float = 0.1, bias_update: bool = False,
                  has_beacon: bool = False, attach=(0.0, 0.0),
-                 guard: bool = True):
+                 guard: bool = True, mxi_freeze=None):
+        # mxi_freeze = (t0, t1): freeze the Friedland drift trim during a
+        # PLANNED maneuver window (deployment knowledge — the commanded
+        # deceleration transient reads as drift to the integrator and
+        # contaminates the anchored agent [measured, hero v2])
         super().__init__()
         self._attach = np.asarray(attach, dtype=float)[:2]
         self._id = int(agent_id)
@@ -47,6 +51,7 @@ class DIEKFSigmaLeaf(LeafSystem):
         self._send_ticks = int(round(send_epoch / _TICK))
         assert abs(self._send_ticks * _TICK - send_epoch) < 1e-12
         self._guard_cos = 0.1 if guard else 0.0
+        self._mxi_freeze = tuple(mxi_freeze) if mxi_freeze is not None else None
         self.records: list[ec.FusionRecord] = []
 
         st0 = ec.FilterState.initial(s0, l)
@@ -151,7 +156,13 @@ class DIEKFSigmaLeaf(LeafSystem):
         if self._beacon is not None and k % 20 == 3:          # (4) beacon, 5 Hz [SPEC]
             b = self._beacon.Eval(context)
             if b[3] > 0.5:
-                st = ec.update_beacon(st, b[:3])
+                if (self._mxi_freeze is not None
+                        and self._mxi_freeze[0] <= t <= self._mxi_freeze[1]):
+                    mxi_hold = st.m_xi.copy()
+                    st = ec.update_beacon(st, b[:3])
+                    st = st.replace(m_xi=mxi_hold)
+                else:
+                    st = ec.update_beacon(st, b[:3])
 
         if k % self._send_ticks == 0:                         # send-epoch snapshot
             zeta = self._odom.Eval(context)

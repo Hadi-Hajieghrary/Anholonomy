@@ -115,7 +115,8 @@ def build_s1(cfg, master_seed: int):
                                                theta_a0=starts[i][2],
                                                turn_bias=cfg.get("turn_bias", 0.0),
                                                turn_amp=cfg.get("turn_amp", 0.0),
-                                               dogleg=cfg.get("dogleg")))
+                                               dogleg=cfg.get("dogleg"),
+                                               decel=cfg.get("decel")))
         ctrl.set_name(f"est_controller_{i}")
         builder.Connect(sens.GetOutputPort("direction"), ctrl.GetInputPort("direction"))
         builder.Connect(sens.GetOutputPort("odom"), ctrl.GetInputPort("odom"))
@@ -127,6 +128,7 @@ def build_s1(cfg, master_seed: int):
                                                 covariance="ci",
                                                 weights=cfg.get("weights", "A3"),
                                                 guard=cfg.get("guard", True),
+                                                mxi_freeze=cfg.get("mxi_freeze"),
                                                 has_beacon=(i == 0 or bool(cfg.get("all_beacons")))))
         # NOTE: attach deliberately NOT passed yet — the lever+σ̂-reconstruction
         # interplay produced indefinite P [measured]; enable with the radial
