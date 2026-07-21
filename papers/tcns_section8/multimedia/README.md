@@ -19,3 +19,6 @@ Multimedia attachments (T-CNS §VIII, Tier-1 only):
                        (tier1_sheaf/campaign/floor_protocol_movie.py)
 All generators are seeded; quantitative claims cite committed campaign
 records (e.g. e3b_production.json), never the movies.
+Playback speeds: M1 8 fps (time-compressed; on-screen clock authoritative);
+M2 15 fps (~6 s of simulated decay over ~8 s of video); M3 25 fps (120 s of
+simulation in ~24 s, ~5x compression).

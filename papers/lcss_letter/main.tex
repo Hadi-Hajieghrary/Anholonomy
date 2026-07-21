@@ -162,12 +162,16 @@ happens when it is violated, which is precisely the switch-off ladder.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{theorem_map.pdf}
-  \caption{Statement-dependency map and proof roadmap. Solid green =
-  \provtag{} (proved, with the proof or sketch in this letter); grey = the
-  sheaf construction (definitions); dashed red = the \conjtag{} stochastic
-  steady-state object, deliberately shown \emph{outside} the proved chain ---
-  it is the boundary discussed in Sec.~\ref{sec:notclaim}, not a dependency
-  of the theorem.}
+  \caption{Statement-dependency map and proof roadmap of the full theory,
+  drawn with the companion's numbering (the letter's own results appear as
+  Lem~3.1 $=$ Lemma~\ref{lem:m}, Lem~7.1 $=$ Lemma~\ref{lem:bch}, Thm~7.2
+  $=$ Theorem~\ref{thm:floor}, Cor~7.3 $=$ Corollary~\ref{cor:sym}). Solid
+  green = \provtag{}: the floor chain is proved or sketched in this letter;
+  the gauge/pinning/contraction branch is proved in the companion and shown
+  for context only. Grey = the sheaf construction (definitions); dashed red
+  = the \conjtag{} stochastic steady-state object, deliberately shown
+  \emph{outside} the proved chain --- it is the boundary discussed in
+  Sec.~\ref{sec:notclaim}, not a dependency of the theorem.}
   \label{fig:thmmap}
 \end{figure}
 
@@ -195,23 +199,29 @@ $D_{ss}$ & steady-state disagreement (\conjtag{} regime) & m$^2$ \\
 
 \begin{table}[t]
 \centering
-\caption{Assumptions: role, how checked, and consequence when violated.}
+\caption{Assumptions: mathematical role, physical interpretation, how
+checked, and consequence when violated.}
 \label{tab:assume}
-\begin{tabular}{p{1.7cm}p{2.6cm}p{3.4cm}}
+\begin{tabular}{p{1.6cm}p{2.7cm}p{3.4cm}}
 \toprule
-assumption & mathematical role & checked by / violated \\
+assumption & role (physical meaning) & checked by / violated \\
 \midrule
-taut cable, length $l$ & the trivialization $m(s)$ exists & broadside margin
+taut cable, length $l$ & the trivialization $m(s)$ exists (the cable is a
+rigid ruler from load to vessel) & broadside margin
 $|\cos\sigma_i| > 0.1$ enforced in every draw; near broadside the reduced
 plant leaves its validity domain (companion, \S VI) \\
-common twist $\xi \ne 0$ & generates the transports $e^{\tau C_j}$ &
+common twist $\xi \ne 0$ & generates the transports $e^{\tau C_j}$ (the load
+is actually moving, so stale beliefs must be fast-forwarded) &
 switch-off arm $\xi = 0$: holonomy $= 0.0$ exactly \\
-persistent turn $\eta \ne 0$ & leading commutator $\propto \eta$ &
-switch-off arm $\eta = 0$: machine zero ($<10^{-17}$) \\
-uniform lag $\tau$ on the cycle & the frozen-generator BCH collection &
+persistent turn $\eta \ne 0$ & leading commutator $\propto \eta$ (the tow is
+turning; a straight tow has no curvature to expose) &
+switch-off arm $\eta = 0$: machine zero ($<10^{-16}$) \\
+uniform lag $\tau$ on the cycle & the frozen-generator BCH collection (every
+link shares one staleness) &
 protocol class $\mathcal{P}$ asserts realized age $\equiv \tau$ per fuse;
 jitter/drop arms are declared outside $\mathcal{P}$ \\
-distinct shapes & $[C_i, C_j] \ne 0$ & coincident and, more generally,
+distinct shapes & $[C_i, C_j] \ne 0$ (the agents view the load through
+different geometry) & coincident and, more generally,
 level-set pairs cancel exactly (Fig.~\ref{fig:heatmap}) \\
 \bottomrule
 \end{tabular}
@@ -254,12 +264,13 @@ walk and
 \begin{equation}
 \mathrm{Log\,Hol} \;=\; \tau^2\,[C_i, C_j] \;+\; O(\tau^3),
 \end{equation}
-which is the object the main theorem bounds (Lem.~7.1 supplies the expansion;
-the theorem's statement and proof appear in Sec.~II). Each hypothesis of the
-theorem corresponds to an exact null of the leading term, and each is a
-measurable switch-off:
+which is the object the main theorem bounds (Lemma~\ref{lem:bch} supplies
+the expansion; the theorem's statement and proof appear in Sec.~II). Each
+hypothesis of the theorem corresponds to an exact null of the leading term,
+and each is a measurable switch-off:
 $s_i \equiv s_j \Rightarrow C_i = C_j \Rightarrow [C_i, C_j] = 0$ (the
-symmetric class, Cor.~7.3); $\xi = 0 \Rightarrow \mathrm{ad}_\xi = 0$; and
+symmetric class, Corollary~\ref{cor:sym}); $\xi = 0 \Rightarrow
+\mathrm{ad}_\xi = 0$; and
 the leading commutator is proportional to the load turn rate $\eta$, vanishing
 identically at $\eta = 0$ (verified to machine zero). For closed walks of
 length $m > 2$ the leading coefficients $\alpha_k$ are combinatorial and are
@@ -346,7 +357,7 @@ around the theorem. Figure~\ref{fig:remstats} gives the full
 empirical CDF of the per-draw remainder constant over all 220 draws (median,
 95th percentile, and supremum marked --- the quoted 0.0133 is the worst
 case, not a typical one), and the histogram of the 20 per-formation fitted
-slopes, whose entire support spans $3\times10^{-13}$ around 1.9993.
+slopes, whose entire support spans $5.7\times10^{-14}$ around 1.9993.
 Figure~\ref{fig:bound} tests the leading-order \emph{prediction} rather
 than the fit: measured $\|\mathrm{Log\,Hol}\|$ against the predicted
 $\tau^2\|[C_i,C_j]\|$ for 60 draws at four stalenesses collapses onto the
@@ -371,7 +382,7 @@ domain is therefore far larger than the operating regime needs.
   \caption{Distributions behind the summary numbers. (a)~Empirical CDF of
   the per-draw remainder constant $\sup_\tau \|R\|/\tau^3$ over 220 shape
   draws; the quoted 0.0133 is the supremum. (b)~All 20 per-formation
-  slopes: support width $3\times10^{-13}$.}
+  slopes: support width $5.7\times10^{-14}$.}
   \label{fig:remstats}
 \end{figure}
 
@@ -412,7 +423,8 @@ domain is therefore far larger than the operating regime needs.
 The $m{=}2$ round trip composes one edge's error transport both ways:
 $\mathrm{Hol} = e^{\tau C_i} e^{\tau C_j} e^{-\tau C_i} e^{-\tau C_j}$, with
 $C_j = \mathrm{Ad}_{m(s_j)}\,\mathrm{ad}_\xi\,\mathrm{Ad}_{m(s_j)}^{-1}$.
-Lemma~7.1 gives $\mathrm{Log\,Hol} = \tau^2 [C_i, C_j] + O(\tau^3)$.
+Lemma~\ref{lem:bch} gives $\mathrm{Log\,Hol} = \tau^2 [C_i, C_j] +
+O(\tau^3)$.
 
 \begin{figure}[t]
   \centering
@@ -436,7 +448,7 @@ arm & prediction & measured \\
 generic slope & $2$ & $1.999$ \\
 coefficient ratio ($m{=}2$) & $1$ & $1.0000$ \\
 $s_i \equiv s_j$ & $0$ & $<10^{-15}$ \\
-$\eta = 0$ & $0$ & $<10^{-17}$ \\
+$\eta = 0$ & $0$ & $<10^{-16}$ \\
 $\xi = 0$ & $0$ & $0.0$ \\
 \bottomrule
 \end{tabular}
@@ -514,28 +526,32 @@ figure, and its outcome. No claim in this letter lacks a row.
 
 \begin{table}[t]
 \centering
-\caption{Theorem-to-experiment correspondence.}
+\caption{Theorem-to-experiment correspondence (assumption column:
+T~$=$ taut, $\xi$~$=$ common twist, $\eta$~$=$ persistent turn,
+U~$=$ uniform lag; Table~\ref{tab:assume}).}
 \label{tab:corr}
-\begin{tabular}{p{2.0cm}p{1.6cm}p{1.9cm}p{1.6cm}}
+\begin{tabular}{p{1.75cm}p{0.7cm}p{1.5cm}p{1.7cm}p{1.35cm}}
 \toprule
-claim & measurement & figure/table & outcome \\
+claim & assumes & measurement & figure/table & outcome \\
 \midrule
-order 2 (Thm~\ref{thm:floor}) & log--log slope, 6 $\tau$ & Fig.~\ref{fig:e3a},
-\ref{fig:ext}a & 1.999 / 2.000 both plants \\
-coefficient 1 ($m{=}2$) & ratio at small $\tau$ & Fig.~\ref{fig:e3a},
-\ref{fig:bound} & 1.0000 \\
-null: $s_i{=}s_j$ (Cor.~\ref{cor:sym}) & switch-off arm & ladder table &
-$<10^{-15}$ \\
-null: $\eta{=}0$ & switch-off arm & ladder table & $<10^{-17}$ \\
-null: $\xi{=}0$ & switch-off arm & ladder table & exactly $0.0$ \\
-null: $\tau{=}0$ & explicit arm & Sec.~III-E(iii) & exactly $0.0$ \\
-$O(\tau^3)$ uniform & 220-draw sup & Fig.~\ref{fig:remstats} & $\le 0.0133$ \\
-level-set class & C15 search + torus scan & Fig.~\ref{fig:heatmap} & discrete;
-exact protection \\
-domain boundary & large-$\tau$ arm & Fig.~\ref{fig:domain} & 10\% at
-$\tau{\approx}10$ \\
-$D_{ss}$ (\conjtag) & companion E3b & Fig.~\ref{fig:forest} & falsified at
-these scales \\
+order 2 (Thm~\ref{thm:floor}) & T$\xi\eta$U & log--log slope, 6 $\tau$ &
+Fig.~\ref{fig:e3a}, \ref{fig:ext}a & 1.999 / 2.000 both plants \\
+coefficient 1 ($m{=}2$) & T$\xi\eta$U & ratio at small $\tau$ &
+Fig.~\ref{fig:e3a}, \ref{fig:bound} & 1.0000 \\
+null: $s_i{=}s_j$ (Cor.~\ref{cor:sym}) & T$\xi\eta$U & switch-off arm &
+ladder table & $<10^{-15}$ \\
+null: $\eta{=}0$ & T$\xi$U & switch-off arm & ladder table & $<10^{-16}$ \\
+null: $\xi{=}0$ & TU & switch-off arm & ladder table & exactly $0.0$ \\
+null: $\tau{=}0$ & T$\xi\eta$ & explicit arm & Sec.~III-E(iii) & exactly
+$0.0$ \\
+$O(\tau^3)$ uniform & T$\xi\eta$U & 220-draw sup & Fig.~\ref{fig:remstats} &
+$\le 0.0133$ \\
+level-set class & T$\xi$ & C15 search + torus scan & Fig.~\ref{fig:heatmap}
+& discrete; exact protection \\
+domain boundary & T$\xi\eta$U & large-$\tau$ arm & Fig.~\ref{fig:domain} &
+10\% at $\tau{\approx}10$ \\
+$D_{ss}$ (\conjtag) & outside $\mathcal{P}$'s noise-free premise & companion
+E3b & Fig.~\ref{fig:forest} & falsified at these scales \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -555,15 +571,17 @@ and gap are printed each frame.)
 comparison under identical protocol: left, a generic pair --- the loop opens
 quadratically; right, the discovered level-set pair 1.06\,rad apart --- the
 loop closes to $10^{-16}$ at \emph{every} $\tau$, with both amplitude traces
-running below. One movie, two behaviors, one changed variable: the
+running below. (Playback: 20\,fps, 8\,s; frames advance the staleness
+$\tau$, not wall time.) One movie, two behaviors, one changed variable: the
 commutator.
 
 \emph{S3 (formation\_sweep.mp4).} Formation invariance as a sweep: the exact
 20-formation draw sequence of the campaign (replayed seed-exact and asserted
 against the persisted record) is shown formation by formation --- geometry,
-per-formation fit, and the slope strip collapsing onto $1.9993$ with spread
-$10^{-13}$. The order is structural; the geometry moves only the
-coefficient.
+per-formation fit, and the slope strip collapsing onto $1.9993$ with
+$10^{-14}$-scale spread. (Playback: 10\,fps, 20\,s; frames advance the
+formation index, not wall time.) The order is structural; the geometry moves
+only the coefficient.
 
 \section{Research-artifact package}
 Beyond the figures and movies above, the letter ships as a structured
@@ -603,6 +621,9 @@ replay harness & \texttt{campaign\_replay.py}: per-cell probes must match
 committed records to $10^{-9}$ (exact class) \\
 environment & \texttt{requirements.lock.txt} (pinned); no GPU required \\
 seeds & every driver embeds its seeds; formation draws are id-keyed \\
+availability & companion repository, released with the paper (archived
+tagged release with DOI at submission); reproduction commands in the root
+\texttt{README} \\
 \bottomrule
 \end{tabular}
 \end{table}

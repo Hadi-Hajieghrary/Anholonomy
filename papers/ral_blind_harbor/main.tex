@@ -528,9 +528,10 @@ seeds & id-keyed; 50 transit seeds (D7), 12 (hero v2), 8 (D10b) \\
 cell & varies & reported in \\
 \midrule
 D2/D4 + controls & $\tau \times$ arm; straight-tow $D_0$ & Fig.~\ref{fig:f4b} \\
-D3 & $\tau$, symmetric class & Fig.~\ref{fig:f4a}, \ref{fig:f5} \\
+D3 & $\tau$, symmetric class & Fig.~\ref{fig:f4a} (F5 renders the Tier-1
+E3c records; D3 supplies the Drake $31\times$ row) \\
 D6 & fusion weights (tension channel) & ledger \\
-D7 & 4 arms $\times$ 50 transits & Table~\ref{tab:scorecard},
+D7 & 5 arms (incl.\ A2) $\times$ 50 transits & Table~\ref{tab:scorecard},
 Fig.~\ref{fig:scorestats} \\
 D8 & integrator step $h$ & Sec.~\ref{sec:results} \\
 D9 & topology $\times N$ ($\lambda_2$) & Fig.~\ref{fig:d9} \\
@@ -577,8 +578,9 @@ plan-faithful acquisition (see text).}
 \toprule
 arm & anch.\,[m] & mean\,[m] & max\,[m] & $D$ & drift\,[m] \\
 \midrule
-B1-limit & 0.99 & \textbf{0.76} & 1.19 & \textbf{0.72} & 42.7 \\
-DIEKF-$\Sigma$ & 1.22 & 1.57 & 2.32 & 2.85 & 31.5 \\
+B1-limit & \textbf{0.99} & \textbf{0.76} & \textbf{1.19} & \textbf{0.72} &
+42.7 \\
+DIEKF-$\Sigma$ & 1.22 & 1.57 & 2.32 & 2.85 & \textbf{31.5} \\
 A2 (unconjugated) & 1.25 & 1.75 & 2.53 & 3.07 & 47.5 \\
 B2 (consensus) & 1.32 & 2.13 & 2.88 & 3.37 & 119.3 \\
 B0 (dead-reckon) & 1.25 & 66.7 & 134.1 & 9624 & 43.8 \\
@@ -625,7 +627,8 @@ below.
 \subsection{Docking outcomes at distribution level, and the v2 remedy}
 The scorecard's means hide neither the ordering nor the failure --- but the
 distributions carry more. Figure~\ref{fig:scorestats} shows all 200 transit
-outcomes: the per-arm boxes and the per-seed CDFs. The ordering
+outcomes of the four scorecard arms (the A2 arm's 50, run by its own driver,
+appear in the table): the per-arm boxes and the per-seed CDFs. The ordering
 B1$^{\mathrm{lim}} >$ paper $>$ B2 $\gg$ B0 holds \emph{seed-wise}, not just
 in aggregate: paired by seed, the paper rule beats B2 on fleet-mean in 41/50
 transits and B0 in 50/50, while the zero-latency limit beats the paper rule
@@ -636,7 +639,7 @@ not the estimator, binds.
 
 Figure~\ref{fig:v2seeds} then reports the tested remedy at seed level: the
 decelerating approach (v2) improves fleet-mean accuracy $2.4\times$ (median
-0.62\,m; 17\% of seeds under the spec) --- necessary but not sufficient ---
+0.61\,m; 17\% of seeds under the spec) --- necessary but not sufficient ---
 and exposes the residual mechanism honestly: the \emph{anchored} agent is
 worse than the fleet mean on 11 of 12 seeds. Sustained Kalman anchoring
 collapses its covariance until the beacon gain starves, while CI's
@@ -659,7 +662,7 @@ trim-contamination hypothesis for the same effect was tested and falsified
   \centering
   \includegraphics[width=0.9\linewidth]{ral_v2_seeds.pdf}
   \caption{Hero v2 (decelerating approach), all 12 seeds sorted: fleet-mean
-  vs.\ anchored-agent dock error. Median 0.62\,m, 17\% under spec ---
+  vs.\ anchored-agent dock error. Median 0.61\,m, 17\% under spec ---
   improvement without sufficiency; the anchored agent is worse than the
   fleet mean on 11/12 seeds (gain starvation); best/median/worst marked,
   worst shown.}
@@ -684,8 +687,8 @@ trim-contamination hypothesis for the same effect was tested and falsified
   \centering
   \includegraphics[width=\linewidth]{f4b_overlay.pdf}
   \caption{Tier-1/Tier-2 agreement on the conjectured steady-state floor
-  ([ES~\S10(ii)]). Panel~(a) separately tests the leading-order, deterministic
-  holonomy amplitude of Thm~7.2 in both tiers. With $D_0$ measured in situ by
+  ([ES~\S10(ii)]). The leading-order, deterministic holonomy amplitude of
+  Thm~7.2 is tested separately in Fig.~\ref{fig:f4a}. With $D_0$ measured in situ by
   straight-tow controls, the fitted excess exponents are 1.101 [1.076, 1.125]
   (Tier-1) and 1.077 [1.054, 1.102] (Drake); the pre-registered equivalence test
   passes ($+0.023$ [$-0.012$, $+0.057$] $\subset$ [$-0.2$, $0.2$]) and the
@@ -829,7 +832,22 @@ closed-loop states of a plant it was never derived for; the conjectured
 $\tau^2$ closed-loop floor is falsified coherently on both plants (fitted
 slopes 1.08--1.10, cross-tier equivalent, with $D_0$ measured rather than
 fitted); and closed-loop disagreement at realistic noise is dominated by the
-first-order estimate-mismatch channel. Pre-registration did the work here: the
+first-order estimate-mismatch channel. Figure~\ref{fig:ladderoverlay} is
+this three-exponent spine in one plot: the $p{=}2.00$ theorem object, the
+$p{=}1.00$ transport-mismatch channel, and the $p{\approx}1.08$ measured
+closed-loop floor between them.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{f4_cross_tier_overlay.pdf}
+  \caption{The epistemic spine in one overlay: three distinct objects, three
+  measured exponents --- Tier-1 $\|\mathrm{Log\,Hol}\|$ ($p = 2.00$, the
+  theorem's object, \provtag); the Drake round-trip transport defect
+  ($p = 1.00$, estimate-mismatch dominated); and the Drake closed-loop
+  $D_{ss}$ ($p = 1.08$ [1.05, 1.10], \conjtag{} regime, $D_0$ measured by
+  the straight-tow control $19$--$21\times$ below). Never conflated.}
+  \label{fig:ladderoverlay}
+\end{figure} Pre-registration did the work here: the
 mixture-fit artifact that initially reported an in-between slope of 1.73 was
 caught by the protocol's own control-arm requirement.
 
@@ -848,11 +866,14 @@ fusion at high degree.
 \paragraph{What centralization is worth.} The strongest measured centralized
 reference --- the record's own architecture at zero latency on the complete
 graph --- improves accuracy by 6\% at the calibration horizon and 19\% at
-dock on long transits. Three re-architected centralized filters, each granted
-zero latency and exact covariances, lost more than a factor of two to the
-decentralized record; and the granted-sensor baseline required six structural
+dock on long transits. One recorded re-architected centralized replay
+(B1-lite), granted zero latency and exact covariances, lost a factor of 2.2
+to the decentralized record (0.41 vs.\ 0.183\,m at the calibration horizon);
+a joint-EKF design run performed comparably (0.43\,m, kept as a design
+record); and the granted-sensor baseline (B3) required six structural
 bring-up iterations (delay-consistent innovation, adjoint-transported
-residuals, joint geometric load solve) without reaching competitiveness. We
+residuals, joint geometric load solve) without reaching competitiveness and
+is excluded as work in progress. We
 read this as evidence that the measurement architecture --- per-agent
 Kalman-weighted constraint channels composed through conjugated transports ---
 is where the accuracy lives, which is the design thesis under test.
@@ -864,7 +885,7 @@ The docking specification is unmet by every arm at
 plan-faithful beacon acquisition, including the zero-latency reference: the
 approach geometry, not the estimator, binds. A decelerating approach is
 necessary and was tested: it improves fleet-mean accuracy $2.4\times$ (median
-0.62\,m) but leaves the spec unmet --- the residual limit is anchored-agent
+0.61\,m) but leaves the spec unmet --- the residual limit is anchored-agent
 gain starvation, in which sustained Kalman anchoring collapses the anchored
 covariance until the beacon gain starves, while CI's structural conservatism
 keeps the unanchored agents' gains healthy; the two covariance architectures
@@ -885,9 +906,32 @@ unilateral cables.
   \includegraphics[width=\linewidth]{ral_failure_taxonomy.pdf}
   \caption{Failure and limit taxonomy: each adverse finding with its
   measured cause and recorded remedy class. Tested-and-falsified remedy
-  hypotheses (the m$_\xi$-trim freeze) are stated inside the cause cards.}
+  hypotheses (the m$_\xi$-trim freeze) are stated inside the cause cards.
+  Table~\ref{tab:failure} adds frequency, severity, and detection.}
   \label{fig:taxonomy}
 \end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Failure table: frequency, severity, detection, mitigation.}
+\label{tab:failure}
+\begin{tabular}{p{1.7cm}p{1.15cm}p{1.05cm}p{1.35cm}p{1.55cm}}
+\toprule
+failure & frequency & severity & detected by & mitigation \\
+\midrule
+docking spec unmet & 50/50 seeds, all arms (v2: 10/12) & task failure,
+recoverable & dock-window metric & decel approach (necessary); covariance
+remedy (revision) \\
+anchored gain starvation & 11/12 v2 seeds & degradation (anchored agent
+only) & per-agent error split & covariance floor / adaptive beacon $R$
+(revision) \\
+ANEES non-transfer & all 450\,s transits (159--229) & consistency claim
+limited & horizon-split ANEES & horizon-scoped claims (adopted) \\
+guard unexercised & all paired gust runs (ON $\equiv$ OFF) & latent (no
+harm observed) & envelope probes & lag-aware margin (design note) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Supplementary movies}
 Four supplementary movies ship with the paper; each is generated by a seeded,
@@ -904,11 +948,13 @@ docking scorecard as the closing card.
 ghost-caisson overlays: each agent's private load estimate drawn as a
 translucent caisson --- coherently drifting, overlapping each other while
 offset from truth --- and the $D(t)$ spike at acquisition, which is
-Cor.~5.2 live.
+Cor.~5.2 live. (Playback $\approx 4.8\times$ real time: stride-2 frames of
+the 10\,Hz log at 24\,fps.)
 
 \emph{S3 (tow\_N5.mp4).} The physical scenario itself: the $N{=}5$ pentagon
 tow in the multibody plant --- cables, drag, thrust allocation --- so the
-reader sees the plant, not a diagram.
+reader sees the plant, not a diagram. (Playback $1.5\times$ real time:
+0.15\,s log frames at 10\,fps.)
 
 \emph{S4 (error\_anatomy.mp4).} The failure-case movie, shipped deliberately:
 hero v2's fleet-mean \emph{median} seed, per-agent errors alongside the
@@ -916,7 +962,9 @@ scene. Pre-beacon, the fleet drifts \emph{together} (the gauge, not
 disagreement); post-beacon, the unanchored agents converge through fusion
 while the anchored agent --- covariance collapsed by sustained anchoring ---
 starves its own beacon gain and stays high. The movie shows the paper's
-binding limit, not its best case.
+binding limit, not its best case. (Playback $\approx 25\times$ real time:
+the 520\,s transit in $\approx$21\,s at 25\,fps; the on-screen clock is
+authoritative.)
 
 \section{Reproducibility and artifact registry}
 Every number in this paper traces to a seeded, versioned driver and a committed
@@ -943,7 +991,8 @@ D2/D4+controls & \texttt{campaign/\{production\_d2\_d4,d2\_*\}.py} &
 \texttt{production\_d2\_d4\_v2.json} etc. \\
 D3 & \texttt{blind\_harbor/d3\_amplitude.py} & \texttt{d3\_amplitude.json} \\
 D6 & \texttt{campaign/d6\_tension.py} & \texttt{d6\_tension.json} \\
-D7 & \texttt{campaign/d7\_scorecard.py} & \texttt{d7\_scorecard.json} \\
+D7 & \texttt{campaign/d7\_scorecard.py}, \texttt{campaign/d7\_a2\_arm.py} &
+\texttt{d7\_scorecard.json}, \texttt{d7\_a2\_arm.json} \\
 D8 & \texttt{campaign/d8\_h\_sweep.py} & \texttt{d8\_h\_sweep.json} \\
 D9 & \texttt{campaign/d9\_scaling.py} & \texttt{d9\_scaling.json} \\
 D10(b,c) & \texttt{campaign/d10\{b,c\}\_*.py} & \texttt{d10b\_loss.json},
@@ -952,7 +1001,7 @@ B1/baselines & \texttt{campaign/\{baselines,b1\_true\}.py} &
 \texttt{baselines.json}, \texttt{b1\_*.json} \\
 hero v1/v2 & \texttt{blind\_harbor/hero\_dogleg.py},
 \texttt{campaign/hero\_v2\_ensemble.py} & \texttt{hero\_*.npz/json} \\
-movies & \texttt{blind\_harbor/hero*.py},
+movies & \texttt{blind\_harbor/hero*.py}, \texttt{render.py} (S3),
 \texttt{campaign/error\_anatomy\_movie.py} & \texttt{*.mp4} + npz \\
 \bottomrule
 \end{tabular}

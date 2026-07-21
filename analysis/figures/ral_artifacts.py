@@ -118,17 +118,17 @@ def fig_architecture():
     ax.text(0.66, 0.955, "ESTIMATOR SIDE (sensors only — truth-isolation lint)",
             ha="center", fontsize=7.5, color="#1b5e20", transform=ax.transAxes)
     boxes = [
-        (0.01, 0.60, 0.13, "barge + $N$ ASVs\ndistance-constraint\ncables, "
-         "analytic tension", "#d7ccc8"),
-        (0.01, 0.18, 0.13, "HydroDrag + Thruster\n(plant-side BY CLASS)",
+        (0.01, 0.60, 0.14, "barge + $N$ ASVs,\ncables (distance\nconstr., "
+         "tension)", "#d7ccc8"),
+        (0.01, 0.18, 0.14, "HydroDrag +\nThruster (plant-\nside BY CLASS)",
          "#d7ccc8"),
-        (0.16, 0.40, 0.12, "sensor models:\nodom 50 Hz, dir 20 Hz,\nbeacon 5 Hz "
-         "@ dock", "#ffe0b2"),
+        (0.17, 0.40, 0.12, "sensor models:\nodom 50 Hz, dir\n20 Hz, beacon\n"
+         "5 Hz @ dock", "#ffe0b2"),
         (0.33, 0.62, 0.15, "InEKF propagate\n(left-invariant, slaved\ntwist via "
          "$\\mathrm{Ad}_{T(a)}$)", "#fff3e0"),
         (0.33, 0.16, 0.15, "direction update +\nbroadside guard\n($Q_G$ declared)",
          "#fff3e0"),
-        (0.53, 0.40, 0.17, "executed-composite fusion\n$T=H_{stale}\\,"
+        (0.51, 0.40, 0.20, "executed-composite fusion\n$T=H_{stale}\\,"
          "m(\\hat s_j)^{-1}\\mathrm{Exp}(\\tau\\hat\\xi)$\n(frozen-shape exact)",
          "#e8f5e9"),
         (0.74, 0.64, 0.12, "comms fabric\n(drops, jitter,\ntopology)", "#ede7f6"),
@@ -241,8 +241,9 @@ def fig_scorecard():
         b.step(pm[x], np.arange(1, 51) / 50, where="post", color=ARM_COL[x],
                lw=1.5, label=ARM_LABEL[x].replace("\n", " "))
     b.axvline(0.5, color="k", ls=":", lw=1.0)
-    b.annotate("0.5 m docking spec\n(0% all arms at plan-\nfaithful acquisition)",
-               (0.53, 0.06), fontsize=6.5)
+    b.annotate("0.5 m docking spec (0% all arms\nat plan-faithful acquisition)",
+               (0.34, 1.01), fontsize=6.0, ha="left", va="bottom",
+               annotation_clip=False)
     b.set_xscale("log")
     b.set_xlabel("fleet-mean dock error (m)"); b.set_ylabel("CDF over seeds")
     b.legend(fontsize=6, loc="upper left")
@@ -253,7 +254,8 @@ def fig_scorecard():
                    if by_seed["paper"][s] < by_seed[a][s]) for a in ("B2", "B0")}
     loss_b1 = sum(1 for s in by_seed["paper"]
                   if by_seed["paper"][s] > by_seed["B1lim"][s])
-    fig.text(0.5, -0.05, f"seed-paired wins (fleet-mean): paper beats B2 in "
+    b.legend(fontsize=5.6, loc="lower right", framealpha=0.9)
+    fig.text(0.5, -0.17, f"seed-paired wins (fleet-mean): paper beats B2 in "
              f"{wins['B2']}/50 and B0 in {wins['B0']}/50; the zero-latency "
              f"limit beats paper in {loss_b1}/50 — staleness is the price.",
              ha="center", fontsize=7.5, color="#37474f")
@@ -285,9 +287,10 @@ def fig_v2_seeds():
     ax.set_xticks(x); ax.set_xticklabels(seeds, fontsize=6.5)
     ax.set_xlabel("seed (sorted by fleet mean)")
     ax.set_ylabel("dock position error (m)")
-    ax.set_title("hero v2 (decelerating approach), 12 seeds:\nfleet-mean "
-                 "median 0.62 m, 17% $<$ 0.5 m — spec unmet;\nanchored agent "
-                 "worse than fleet mean on 11/12 (gain starvation)",
+    med = float(np.median(pms))
+    ax.set_title(f"hero v2 (decelerating approach), 12 seeds:\nfleet-mean "
+                 f"median {med:.2f} m, 17% $<$ 0.5 m — spec unmet;\nanchored "
+                 f"agent worse than fleet mean on 11/12 (gain starvation)",
                  fontsize=8)
     ax.legend(fontsize=7)
     save(fig, "ral_v2_seeds")
@@ -317,7 +320,8 @@ def fig_forest():
          ("band", (-0.2, 0.2)), "EQUIVALENT", PASS_C),
         ("D6 tension $\\Delta$RMSE (m)\n(d6_tension.json)", -0.0109, -0.0084,
          -0.0058, ("line", 0.0), "Part 1 PASSES", PASS_C),
-        ("D9 pin-rate $\\rho$ vs $\\lambda_2$\n(d9_scaling.json)", None, 0.04,
+        ("D9 pin-rate $\\rho$ vs $\\lambda_2$\n(d9_scaling.json; point est.,\n"
+         "no CI registered)", None, 0.04,
          None, ("line", 0.0), "falsifier FIRES (anchor-limited)", FAIL_C),
         ("D9 re-lock $\\rho$\n(d9_scaling.json)", -0.65, -0.51, -0.36,
          ("line", 0.0), "ANTI-ORDERS (stiff consensus)", TRIP_C),

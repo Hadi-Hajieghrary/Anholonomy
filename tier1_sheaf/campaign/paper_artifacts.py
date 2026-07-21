@@ -181,11 +181,12 @@ def fig_theorem_map():
     E = [("L31", "SHF"), ("L32", "SHF"), ("SHF", "T51"), ("T51", "C52"),
          ("T51", "C53"), ("SHF", "T63"), ("L31", "L71"), ("L71", "T72"),
          ("SHF", "T72"), ("T72", "C73"), ("T72", "DSS")]
-    tagc = {"P": ("#e8f5e9", PASS_C), "C": ("#fbe9e7", TRIP_C), "D": ("#eceff1", "#37474f")}
+    tagc = {"P": ("#e8f5e9", PASS_C), "C": ("#fbe9e7", FAIL_C), "D": ("#eceff1", "#37474f")}
     for k, (x, y, lab, tg) in B.items():
         fc, ec = tagc[tg]
         ax.add_patch(FancyBboxPatch((x - 0.005, y - 0.06), 0.17, 0.13,
                      boxstyle="round,pad=0.012", fc=fc, ec=ec, lw=1.2,
+                     ls="--" if tg == "C" else "-",
                      transform=ax.transAxes, zorder=3))
         ax.text(x + 0.08, y + 0.005, lab, transform=ax.transAxes, fontsize=6.8,
                 ha="center", va="center", zorder=4)
@@ -282,13 +283,17 @@ def fig_remainder():
     a.set_xlabel("$\\sup_\\tau \\Vert R(\\tau,s)\\Vert/\\tau^3$ per draw")
     a.set_ylabel("empirical CDF")
     a.set_title("(a) remainder constant, 220 shape draws")
-    b.hist(slopes, bins=12, color="#1565c0", alpha=0.85)
-    b.axvline(2.0, color=FAIL_C, lw=1.2, ls="--")
-    b.annotate("exact order 2", (2.0, b.get_ylim()[1] * 0.9), color=FAIL_C,
-               fontsize=8, ha="right", rotation=90)
+    # histogram in deviation units: the 20 slopes span ~6e-14, invisible on
+    # an axis forced to include 2.0 [audit catch]
+    ref = 1.9992678569271
+    b.hist((np.array(slopes) - ref) * 1e14, bins=10, color="#1565c0",
+           alpha=0.85)
     mu, sd = np.mean(slopes), np.std(slopes)
-    b.set_title(f"(b) fitted slope, 20 formations: {mu:.4f} $\\pm$ {sd:.1e}")
-    b.set_xlabel("log–log slope of $\\Vert\\log\\mathrm{Hol}\\Vert$ vs $\\tau$")
+    width = max(slopes) - min(slopes)
+    b.set_title(f"(b) fitted slope, 20 formations: {mu:.6f}\n"
+                f"support width {width:.1e}; offset from 2 is the finite-"
+                f"$\\tau$ fit", fontsize=8)
+    b.set_xlabel("slope $-$ 1.9992678569271  ($\\times 10^{-14}$)")
     b.set_ylabel("count")
     save(fig, "lcss_remainder_stats")
 
@@ -405,6 +410,9 @@ def fig_forest():
             ax.plot([lo, hi], [y, y], color=col, lw=2.2)
             ax.plot([lo, lo], [y - 0.12, y + 0.12], color=col, lw=1.6)
             ax.plot([hi, hi], [y - 0.12, y + 0.12], color=col, lw=1.6)
+        else:
+            ax.annotate("(point est.; no CI registered)", (mid * 1.25, y),
+                        fontsize=5.5, color="#78909c", va="center")
         ax.plot(mid, y, "o", ms=5, color=col)
         ax.annotate(verdict, (10.6, y), fontsize=7, color=col, va="center")
     ax.set_yticks(range(len(rows)))
@@ -424,9 +432,12 @@ def fig_dss():
     runs = json.load(open(os.path.join(RES, "e3b_production.json")))
     tau_ref = 0.4
     arms = ["paper", "A1", "A2", "straight", "frozen"]
-    labels = {"paper": "paper rule", "A1": "A1 (no $\\mathrm{Ad}$)",
-              "A2": "A2 (stale frame)", "straight": "straight tow ($D_0$)",
-              "frozen": "frozen+noise-off"}
+    # arm semantics from estimator_core/rules.py (id travels in config,
+    # never a free label): A1 = no lag compensation; A2 = un-conjugated
+    # own BODY twist [audit catch: earlier labels were inverted paraphrases]
+    labels = {"paper": "paper rule", "A1": "A1 (no compensation)",
+              "A2": "A2 (un-conjugated)", "straight": "straight tow ($D_0$)",
+              "frozen": "frozen shapes (noise on)"}
     fig, (a, b) = plt.subplots(1, 2, figsize=(7.0, 2.6))
     cols = plt.cm.tab10(np.linspace(0, 0.5, len(arms)))
     for arm, col in zip(arms, cols):
@@ -466,7 +477,7 @@ def fig_dss():
 def fig_ladder():
     runs = json.load(open(os.path.join(RES, "e3b_production.json")))
     arms = ["paper", "A1", "A2", "straight", "frozen"]
-    labels = ["paper rule", "A1 no-$\\mathrm{Ad}$", "A2 stale-frame",
+    labels = ["paper rule", "A1 no-\ncompensation", "A2 un-\nconjugated",
               "straight tow ($\\eta{=}0$)", "frozen shapes\n(noise on)"]
     taus = [0.1, 0.2, 0.4, 0.8]
     fig, ax = plt.subplots(figsize=(4.6, 2.8))
@@ -488,9 +499,9 @@ def fig_ladder():
     ax.set_xticklabels(labels, fontsize=7, rotation=10)
     ax.set_ylabel("median $D_{ss}$")
     ax.legend(fontsize=6.5, ncol=2, loc="upper right")
-    ax.set_title("E3b arms — median $D_{ss}$ [CONJ]. A1 below paper: the "
-                 "Tier-1\nordering inversion (C18) — $D_{ss}$ never ranks rules",
-                 fontsize=8)
+    ax.set_title("E3b arms — median $D_{ss}$ [CONJ]. A1 (no compensation) "
+                 "below paper:\nthe Tier-1 ordering inversion (C18) — "
+                 "$D_{ss}$ never ranks rules", fontsize=8)
     # the noise-off frozen NULL (D~6e-30, e3b regression probe) is reported in
     # text, not plotted: it is 27 orders below the axis
     json.dump({str(t): [None if not np.isfinite(v) else float(v) for v in meds[t]]
