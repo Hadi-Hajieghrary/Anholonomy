@@ -34,20 +34,6 @@ theorem's claim.
 \end{abstract}
 
 \section{Introduction}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{lcss_graphical_abstract.pdf}
-  \caption{Visual summary. \emph{Problem:} cable-coupled agents fuse
-  delayed load-pose beliefs around a communication cycle. \emph{Mechanism:}
-  the composition of stale shape-dependent transports fails to close by the
-  holonomy of the constraint connection, $\tau^2[C_i,C_j]+O(\tau^3)$.
-  \emph{Result:} the amplitude is verified to coefficient precision (measured
-  slope 1.999; the $\tau^2$ law dotted), and every hypothesis-negating
-  switch-off sits at machine zero.}
-  \label{fig:abstract}
-\end{figure}
-
 When cable-coupled agents estimate a common load pose from purely local
 sensing --- each observing only its own odometry and its own cable --- their
 beliefs live in different body frames, and fusing them requires transporting
@@ -62,50 +48,38 @@ The round trip (one edge, both ways) is the natural object because first-order
 transport terms cancel in any closed walk, exposing the geometric
 (curvature-generated) obstruction as the leading survivor.
 
-Figure~\ref{fig:schematic} fixes the geometry and the object of study before
-any formalism: panel~(a) is the problem-definition and notation diagram ---
-the load pose $G \in SE(2)$ with its body frame $(x_L, y_L)$, one agent's taut
-cable of length $l$, and the two coordinates of that agent's \emph{shape}
-$s = (\sigma, \sigma_i)$: the cable's direction measured at the load (from
-$x_L$) and measured at the vessel (from its hull axis). These two angles are
-the only geometry the theory needs, and they are exactly what each agent can
-sense locally. Panel~(b) is the mathematical mechanism in one picture: a
-reference frame carried around the four-leg loop $e^{\tau C_i} e^{\tau C_j}
-e^{-\tau C_i} e^{-\tau C_j}$ returns displaced; the closing defect (red)
-\emph{is} the holonomy, and the theorem says its magnitude is
-$\tau^2\|[C_i,C_j]\|$ to leading order.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{lcss_schematic.pdf}
-  \caption{(a)~Problem definition and notation: load pose $G$, cable length
-  $l$, and the shape pair $s=(\sigma,\sigma_i)$ --- the cable direction in the
-  load frame and in the vessel frame. The trivialization
-  $m(\sigma,\sigma_i)$ (Lemma~\ref{lem:m}) is built from exactly these
-  quantities. (b)~The mechanism: transporting a frame around the stale
-  round-trip loop leaves a closing defect (red) --- the error-transport
-  holonomy, $\tau^2[C_i,C_j]+O(\tau^3)$.}
-  \label{fig:schematic}
-\end{figure}
+Figure~\ref{fig:scene} fixes the geometry: the load pose $G \in SE(2)$ with
+its body frame, and each agent's \emph{shape} $s = (\sigma, \sigma_i)$ --- the
+cable's direction measured at the load and at the vessel. These two angles are
+the only geometry the theory needs, and they are exactly what each agent senses
+locally; because they differ across agents, the conjugated generators $C_j$
+differ and $[C_i,C_j]\neq0$, the source of the floor.
 
 \section{Setting and main result}
 Let $g_L \in SE(2)$ be the load pose and $s_j = (\sigma, \sigma_i)$ agent
-$j$'s shape pair (cable direction in the load and body frames).
-Figure~\ref{fig:scene} shows the physical setting the floor lives in: the
-reduced cooperative-tow plant executing a persistent turn, so the shape fan
-keeps moving --- the theorem's standing hypothesis $\xi\ne0$, $\eta\ne0$.
+$j$'s shape pair (cable direction in the load and body frames). The physical
+setting is a cooperative tow executing a persistent turn, so the shape fan
+keeps moving (Fig.~\ref{fig:shape}) --- the theorem's standing hypothesis
+$\xi\ne0$, $\eta\ne0$.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{lcss_transit_scene.pdf}
-  \caption{The cooperative-tow scenario. (a)~Geometry in the load frame: five
-  vessels on cables, each viewing the load through its own shape
-  $s_j=(\sigma_j,\sigma_{i,j})$ --- so the conjugated generators $C_j$ differ
-  and $[C_i,C_j]\neq0$, the source of the floor. (b)~The real cable-angle
-  trajectories $\sigma_j(t)$ from the reduced-plant run: the fan never stops
-  moving under the persistent turn, so the lagged transports carry a nonzero
-  twist and the floor is active. (Recorded run, seed 0.)}
+  \includegraphics[width=\linewidth]{lcss_geometry.pdf}
+  \caption{Cooperative-tow geometry in the load frame: five vessels on cables,
+  each viewing the load through its own shape $s_j=(\sigma_j,\sigma_{i,j})$, so
+  the conjugated generators $C_j$ differ and $[C_i,C_j]\neq0$ --- the source of
+  the latency--curvature floor. (Recorded run, seed 0.)}
   \label{fig:scene}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_shape_motion.pdf}
+  \caption{The real cable-angle trajectories $\sigma_j(t)$ from the
+  reduced-plant run: the shape fan never stops moving under the persistent
+  turn, so the lagged transports carry a nonzero twist and the floor is
+  active.}
+  \label{fig:shape}
 \end{figure}
 
 \begin{lemma}[Constraint trivialization]\label{lem:m}
@@ -307,27 +281,33 @@ length $m > 2$ the leading coefficients $\alpha_k$ are combinatorial and are
 left open here (they are not needed for the $m{=}2$ result this letter
 verifies); no experiment below assumes them.
 
-Figure~\ref{fig:filmstrip} makes the mechanism and its null directions
-visible: the trail of a belief's frame origin as it is carried along the
-four legs $e^{\tau C_i}e^{\tau C_j}e^{-\tau C_i}e^{-\tau C_j}$. For a generic
-pair (left) the trail is a genuine loop that fails to close; the gap between
-its end and its start (red) is the holonomy, and it grows with $\tau$. For
-the level-set pair (right) the loop degenerates --- the belief travels out
-along the common generator and retraces exactly --- so it returns to the
-start at machine precision for every $\tau$. Supplementary movie S2 animates
-the same trail.
+Figures~\ref{fig:filmstrip} and~\ref{fig:looplvl} make the mechanism and its
+null directions visible: the trail of a belief's frame origin as it is carried
+along the four legs $e^{\tau C_i}e^{\tau C_j}e^{-\tau C_i}e^{-\tau C_j}$. For a
+generic pair (Fig.~\ref{fig:filmstrip}) the trail is a genuine loop that fails
+to close; the gap between its end and its start (red) is the holonomy, and it
+grows with $\tau$. For the level-set pair (Fig.~\ref{fig:looplvl}) the loop
+degenerates --- the belief travels out along the common generator and retraces
+exactly --- so it returns to the start at machine precision for every $\tau$.
+Supplementary movie S2 animates the same trail.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{lcss_loop_filmstrip.pdf}
-  \caption{The transported belief's trail around the stale fusion loop.
-  \emph{Left, generic pair:} the trail is a closed walk that does not close;
-  the red arrow is the holonomy gap, drawn for the largest $\tau$, and the
-  nested loops grow with $\tau\in\{0.4,0.8,1.2,1.6\}$. \emph{Right, level-set
-  pair ($C_i=C_j$):} the walk goes out and retraces, returning to the start
-  (gap $<10^{-15}$) at every $\tau$. The visible failure-to-close \emph{is}
-  the disagreement a stale round trip injects.}
+  \includegraphics[width=\linewidth]{lcss_loop_generic.pdf}
+  \caption{Generic pair: the transported belief's trail is a closed walk that
+  does not close. The red arrow is the holonomy gap for the largest $\tau$;
+  the nested loops grow with $\tau\in\{0.4,0.8,1.2,1.6\}$. The visible
+  failure-to-close \emph{is} the disagreement a stale round trip injects.}
   \label{fig:filmstrip}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_loop_levelset.pdf}
+  \caption{Level-set pair ($C_i=C_j$): the walk goes out along the common
+  generator and retraces exactly, returning to the start (gap $<10^{-15}$) at
+  every $\tau$ --- exact protection at all orders.}
+  \label{fig:looplvl}
 \end{figure}
 
 \subsection{Measurement protocol}
@@ -346,7 +326,8 @@ holonomy, growing quadratically alongside the traced amplitude law.
 
 \subsection{Extension experiments}
 Four further pre-registered arms complete the verification
-(Fig.~\ref{fig:ext}). Figure~\ref{fig:carpet} first gives the whole picture
+(Figs.~\ref{fig:slopehist}--\ref{fig:ext}). Figure~\ref{fig:carpet} first
+gives the whole picture
 in one field: the measured amplitude over a grid of staleness $\tau$ and
 shape separation $\Delta = \|s_j - s_i\|$. The floor deepens as $\tau^2$
 along the vertical, and along the horizontal it collapses into a sharp valley
@@ -355,7 +336,7 @@ quantify.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.82\linewidth]{lcss_amplitude_carpet.pdf}
+  \includegraphics[width=0.82\linewidth]{lcss_carpet.pdf}
   \caption{The floor as a field: $\log_{10}\|\log\mathrm{Hol}\|$ over
   staleness $\tau$ (vertical, log) and shape separation $\Delta$ (horizontal,
   along a ray through the level-set partner). The amplitude grows as $\tau^2$
@@ -405,25 +386,11 @@ shape has an isolated conjugation twin, not a continuous curve of them, and
 nowhere on the torus does the commutator vanish without the generators
 coinciding. This sharpens the observation: protection is all-or-nothing in
 shape space, and the ``valley'' visible in the heatmap is a finite-depth
-saddle everywhere except at the two exact zeros. Figure~\ref{fig:landscape}
-renders the same fact as a surface: the commutator magnitude is bounded away
-from zero everywhere on the torus except at the two marked points (red
-stems), where it drops to machine precision.
+saddle everywhere except at the two exact zeros.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.82\linewidth]{lcss_commutator_landscape.pdf}
-  \caption{The commutator surface $\log_{10}\|[C(s_{\mathrm{ref}}),C(s)]\|$
-  over the whole shape torus. It is bounded away from zero everywhere except
-  at two points (red stems, $s_{\mathrm{ref}}$ and its level partner) --- the
-  protected class is discrete, a strengthening of the coincident-shape
-  corollary that only a global search reveals.}
-  \label{fig:landscape}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.8\linewidth]{lcss_commutator_heatmap.pdf}
+  \includegraphics[width=\linewidth]{lcss_heatmap.pdf}
   \caption{The protected class, globally.
   $\log_{10}\|[C(s_{\mathrm{ref}}), C(s)]\|$ over the shape torus, with
   $s_{\mathrm{ref}}$ the first C15 pair's first shape (star). An exhaustive
@@ -434,20 +401,17 @@ stems), where it drops to machine precision.
   \label{fig:heatmap}
 \end{figure}
 
-Three further statistical and boundary artifacts complete the evidence
-around the theorem. Figure~\ref{fig:remstats} gives the full
-\emph{distributions} behind the summary numbers of arms (i)--(ii): the
-empirical CDF of the per-draw remainder constant over all 220 draws (median,
-95th percentile, and supremum marked --- the quoted 0.0133 is the worst
-case, not a typical one), and the histogram of the 20 per-formation fitted
-slopes, whose entire support spans $5.7\times10^{-14}$ around 1.9993.
+Four further statistical and boundary artifacts complete the evidence
+around the theorem. Figure~\ref{fig:slopehist} shows the 20 per-formation
+fitted slopes, whose entire support spans $5.7\times10^{-14}$ around 1.9993
+(arm~i). Figure~\ref{fig:remstats} gives the empirical CDF of the per-draw
+remainder constant over all 220 draws, median/95th-percentile/supremum
+marked --- the quoted 0.0133 is the worst case, not a typical one (arm~ii).
 Figure~\ref{fig:bound} tests the leading-order \emph{prediction} rather
-than the fit: measured $\|\mathrm{Log\,Hol}\|$ against the predicted
-$\tau^2\|[C_i,C_j]\|$ for 60 draws at four stalenesses collapses onto the
-identity line (panel a), and the measured-to-predicted ratio rises to 1
-as $\tau \to 0$ with a 5--95\% band narrower than $2\times10^{-4}$
-(panel b): the theorem's constant is not just consistent with the data ---
-it \emph{is} the data, to the width of the $O(\tau^3)$ remainder.
+than the fit: the measured-to-predicted ratio rises to 1 as $\tau \to 0$
+with a 5--95\% band narrower than $2\times10^{-4}$, so the theorem's constant
+is not just consistent with the data --- it \emph{is} the data, to the width
+of the $O(\tau^3)$ remainder.
 Figure~\ref{fig:domain} then shows where the leading order \emph{stops}
 describing: extending $\tau$ an order of magnitude beyond the operating grid,
 the measured amplitude departs from the $\tau^2$ law by 10\% only at
@@ -461,27 +425,34 @@ domain is therefore far larger than the operating regime needs.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{lcss_remainder_stats.pdf}
-  \caption{Distributions behind the summary numbers. (a)~Empirical CDF of
-  the per-draw remainder constant $\sup_\tau \|R\|/\tau^3$ over 220 shape
-  draws; the quoted 0.0133 is the supremum. (b)~All 20 per-formation
-  slopes: support width $5.7\times10^{-14}$.}
+  \includegraphics[width=\linewidth]{lcss_slope_hist.pdf}
+  \caption{Formation invariance (arm~i): the 20 per-formation fitted slopes,
+  in deviation units, span only $5.7\times10^{-14}$ around 1.9993 --- the
+  $\tau^2$ order is a structural constant.}
+  \label{fig:slopehist}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_remainder_cdf.pdf}
+  \caption{Uniform remainder (arm~ii): empirical CDF of the per-draw
+  remainder constant $\sup_\tau \|R\|/\tau^3$ over 220 shape draws; the
+  quoted 0.0133 is the supremum, not a typical value.}
   \label{fig:remstats}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{lcss_bound_tightness.pdf}
-  \caption{Bound tightness. (a)~Measured amplitude vs.\ the leading-order
-  prediction $\tau^2\|[C_i,C_j]\|$, 60 draws $\times$ 4 stalenesses, on the
-  identity line. (b)~Measured/predicted ratio $\to 1$ as $\tau \to 0$;
-  the 5--95\% band across draws is narrower than $2\times10^{-4}$.}
+  \includegraphics[width=\linewidth]{lcss_bound_ratio.pdf}
+  \caption{Bound tightness: the measured/predicted ratio
+  $\|\mathrm{Log\,Hol}\|/\tau^2\|[C_i,C_j]\|$ rises to 1 as $\tau \to 0$, the
+  5--95\% band across 60 draws narrower than $2\times10^{-4}$.}
   \label{fig:bound}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.75\linewidth]{lcss_domain_boundary.pdf}
+  \includegraphics[width=0.75\linewidth]{lcss_domain.pdf}
   \caption{Outside the leading-order domain: the measured amplitude departs
   from the $\tau^2$ law by 10\% only at $\tau \approx 10$ --- an order of
   magnitude beyond the operating grid ($\tau \le 1.6$), where the relative
@@ -492,13 +463,11 @@ domain is therefore far larger than the operating regime needs.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{e3a_extension_panels.pdf}
-  \caption{Extension arms. (a)~Slope across 20 random taut formations:
-  $1.9993 \pm 0.0000$ --- formation-invariant. (b)~Remainder constant over
-  220 draws: uniformly tight $O(\tau^3)$ truncation. (c)~Zero-commutator
-  pairs at $\ge 1$\,rad separation all satisfy $C_i = C_j$ to $10^{-16}$:
-  the protected class is a level set. (d)~Coefficient ratio $\to 1$ as
-  $\tau \to 0$.}
+  \includegraphics[width=\linewidth]{lcss_levelset_bars.pdf}
+  \caption{Level-set protection (arm~iv): the five zero-commutator pairs
+  found at $\ge 1$\,rad separation all satisfy $C_i = C_j$ to $10^{-16}$
+  (both bars below machine precision) --- the protected class is a level set,
+  not just coincident shapes.}
   \label{fig:ext}
 \end{figure}
 
@@ -511,7 +480,7 @@ O(\tau^3)$.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{e3a_amplitude.png}
+  \includegraphics[width=\linewidth]{lcss_amplitude.pdf}
   \caption{Measured $\|\mathrm{Log\,Hol}\|$ vs.\ $\tau$ (analytic shapes).
   Generic pair: fitted slope $1.999$ over $\tau \in [0.05, 1.6]$\,s; the
   coefficient ratio $\|\mathrm{Log\,Hol}\|/\tau^2\|[C_i,C_j]\| = 1.0000$ at
@@ -670,17 +639,19 @@ only the coefficient.
 Beyond the figures and movies above, the letter ships as a structured
 evidence package; every item is generated by committed code from committed
 records.
-\emph{Conceptual}: the problem/notation schematic and mechanism diagram
-(Fig.~\ref{fig:schematic}), the statement-dependency map
+\emph{Conceptual}: the tow geometry (Fig.~\ref{fig:scene}) and shape motion
+(Fig.~\ref{fig:shape}), the statement-dependency map
 (Fig.~\ref{fig:thmmap}). \emph{Formal}: notation
 (Table~\ref{tab:notation}), assumptions with violation consequences
 (Table~\ref{tab:assume}), theorem-to-experiment correspondence
 (Table~\ref{tab:corr}). \emph{Quantitative}: the amplitude law
-(Fig.~\ref{fig:e3a}), extension panels (Fig.~\ref{fig:ext}), remainder
-distributions (Fig.~\ref{fig:remstats}), bound tightness
+(Fig.~\ref{fig:e3a}), the loop-trail mechanism (Figs.~\ref{fig:filmstrip},
+\ref{fig:looplvl}), formation invariance (Fig.~\ref{fig:slopehist}),
+remainder (Fig.~\ref{fig:remstats}), bound tightness
 (Fig.~\ref{fig:bound}), domain boundary (Fig.~\ref{fig:domain}), the global
-level-set map (Fig.~\ref{fig:heatmap}), the switch-off ladder (table), and
-the adjudicated falsifier ledger (Fig.~\ref{fig:forest}). \emph{Multimedia}:
+level-set map (Fig.~\ref{fig:heatmap}) and level-set bars
+(Fig.~\ref{fig:ext}), and the adjudicated falsifier ledger
+(Fig.~\ref{fig:forest}). \emph{Multimedia}:
 movies S1--S3 with per-frame quantitative overlays. \emph{Reproducibility}:
 Table~\ref{tab:repro} inventories the executable artifacts.
 
