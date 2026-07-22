@@ -37,13 +37,14 @@ of this section.
   \includegraphics[width=\linewidth]{figures/tcns_plant.pdf}
   \caption{The reduced plant and its communication structure: shapes
   $s_j = (\sigma_j, \sigma_{i,j})$ on taut unit cables; the comms graph
-  (dashed) is a controlled variable --- (a) the $C_5$ default, (b) $K_5$.}
+  (dashed) is a controlled variable (the $C_5$ default shown; $K_5$ and the
+  E6 sweep vary $\lambda_2$).}
   \label{fig:plantF}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/tcns_architecture.pdf}
+  \includegraphics[width=\linewidth]{figures/tcns_arch.pdf}
   \caption{The executed estimator pipeline and its information boundary:
   local sensing (odometry, cable direction), $\tau$-stale shared estimates
   transported through $\rho = \mathrm{Ad}_m \circ \pi_L$ with sheaf weights
@@ -103,7 +104,7 @@ convergence rate --- the pinning corollary as linear algebra
 (Fig.~\ref{fig:f3}).
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/e1_gauge.png}
+  \includegraphics[width=\linewidth]{figures/tcns_e1_spectrum.pdf}
   \caption{Gauge spectrum: $\dim\ker L_\mathcal{F} = 3$ without an anchor,
   collapsing to zero with one anchor whose $\lambda_{\min}$ becomes the
   rate. (The harmonic-section identity --- kernel $=$ body-framed images of
@@ -114,14 +115,20 @@ convergence rate --- the pinning corollary as linear algebra
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/tcns_gauge_story.pdf}
-  \caption{The gauge phenomenon as trajectories. (a)~With no anchor, the
-  agents' load-pose estimates (colours) track each other but drift as a rigid
-  group off the truth (black); at the beacon (stars) they snap back
-  (dashed). (b)~The two error objects are distinct: the disagreement $D$
-  (agents vs.\ each other) runs about an order of magnitude below the gauge
-  error (agents vs.\ truth); one anchor collapses both (Thm.~5.1, Cor.~5.2).}
+  \includegraphics[width=\linewidth]{figures/tcns_gauge_trails.pdf}
+  \caption{The gauge phenomenon as trajectories: with no anchor the agents'
+  load-pose estimates (colours) track each other but drift as a rigid group
+  off the truth (black); at the beacon (stars) they snap back (dashed).}
   \label{fig:gaugestory}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/tcns_gauge_errors.pdf}
+  \caption{The two error objects are distinct: the disagreement $D$ (agents
+  vs.\ each other) runs about an order of magnitude below the gauge error
+  (agents vs.\ truth); one anchor collapses both (Thm.~5.1, Cor.~5.2).}
+  \label{fig:gaugeerr}
 \end{figure}
 
 \subsection{The theorem's object: amplitude, coefficient, switch-offs
@@ -131,17 +138,17 @@ slope $1.999$ over $\tau \in [0.05, 1.6]$\,s with coefficient ratio
 $\|\mathrm{Log\,Hol}\|/\tau^2\|[C_i,C_j]\| = 1.0000$ at the smallest $\tau$;
 the switch-off arms sit at machine zero ($s_i{\equiv}s_j$: $<10^{-15}$;
 $\eta{=}0$: $<10^{-16}$; $\xi{=}0$: exactly $0.0$; explicit $\tau{=}0$ arm:
-exactly $0.0$). Four extension arms sharpen this (Fig.~\ref{fig:f4aext}):
-the slope is formation-invariant across 20 random taut formations
-($1.9993 \pm 0.0000$); the remainder constant is uniformly tight
+exactly $0.0$). Extension arms sharpen this: the slope is
+formation-invariant across 20 random taut formations ($1.9993 \pm 0.0000$,
+Fig.~\ref{fig:f4aext}); the remainder constant is uniformly tight
 ($\sup_{s,\tau} \|R\|/\tau^3 \le 0.0133$ over 220 draws); and a search for
 zero-commutator pairs at $\ge 1$\,rad shape separation found only pairs with
-$C_i = C_j$ to $10^{-16}$ --- the protected class of
+$C_i = C_j$ to $10^{-16}$ (Fig.~\ref{fig:c15tc}) --- the protected class of
 Cor.~\ref{cor:symF} extends, empirically, to the level set of
 $s \mapsto C(s;\xi)$, where the full holonomy vanishes at all orders.
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/e3a_amplitude.png}
+  \includegraphics[width=\linewidth]{figures/tcns_amplitude.pdf}
   \caption{F4a: the leading-order, deterministic holonomy amplitude of
   Thm.~\ref{thm:floorF} --- slope 1.999, coefficient 1.0000, switch-offs at
   machine zero.}
@@ -149,29 +156,27 @@ $s \mapsto C(s;\xi)$, where the full holonomy vanishes at all orders.
 \end{figure}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/e3a_extension_panels.pdf}
-  \caption{E3a extension arms: formation-invariant order; uniform
-  $O(\tau^3)$ remainder; the level-set symmetry class; coefficient ratio
-  $\to 1$.}
+  \includegraphics[width=\linewidth]{figures/tcns_formations.pdf}
+  \caption{E3a formation invariance: 20 random taut formations overlaid ---
+  the geometry varies widely, yet every one fits slope $1.9993$. The $\tau^2$
+  order is a structural constant.}
   \label{fig:f4aext}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/tcns_formation_gallery.pdf}
-  \caption{Formation invariance, shown as geometry. Twenty random taut
-  two-agent formations (load box, two cables to two vessels): the geometry
-  varies widely, yet every one fits the same order to four decimals
-  ($1.9993\pm10^{-14}$). The $\tau^2$ law is a structural constant; only the
-  coefficient depends on the shapes.}
-  \label{fig:formgallery}
+  \includegraphics[width=\linewidth]{figures/lcss_levelset_bars.pdf}
+  \caption{E3a level-set protection (C15): the five zero-commutator pairs at
+  $\ge 1$\,rad separation all satisfy $C_i = C_j$ to $10^{-16}$ --- the
+  protected class is a level set, not just coincident shapes.}
+  \label{fig:c15tc}
 \end{figure}
 
 \subsection{The conjectured closed-loop floor, falsified in its own regime
 (E3b)}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/f4b_tier1.pdf}
+  \includegraphics[width=\linewidth]{figures/tcns_f4b.pdf}
   \caption{Numerical evidence for the conjectured stochastic steady-state
   floor ([ES \S10(ii)]); Theorem~\ref{thm:floorF} is leading-order and
   deterministic and is tested in Fig.~\ref{fig:f4a}. Fitted excess exponent
@@ -192,31 +197,36 @@ $\approx 5\times$ below the paper arm and the frozen-shape control
 $\approx 15\times$ below, at every $\tau$ --- and the executed null pins the
 harness: shapes frozen and noise off give $D_{ss} \sim 10^{-30}$.
 
-Figure~\ref{fig:dssdist} exposes the \emph{distributions} the fitted exponent
-summarizes, at the reference staleness $\tau = 0.4$: per-run $D_{ss}$ CDFs by
-arm over every seed and formation, and the paper-rule spread across the
-$\tau$ grid. Two facts the summary hides are visible here. First, the arm
-separation is distributional, not just in medians: the paper-rule and
-frozen-shape CDFs do not overlap at any quantile. Second, the seed-and-formation spread within an arm ($\approx 1.6\times$
-interquartile, $\approx 3.7\times$ between the 5th and 95th percentiles) is
-comparable to one $\tau$ octave --- which is exactly why the campaign
-pre-registered seed-paired estimators for the $\varepsilon$-response (below)
-and why unpaired CIs were declared under-powered.
+Figures~\ref{fig:dssdist} and~\ref{fig:dssbox} expose the \emph{distributions}
+the fitted exponent summarizes. At the reference staleness $\tau = 0.4$
+(Fig.~\ref{fig:dssdist}) the arm separation is distributional, not just in
+medians: the paper-rule and frozen-shape CDFs do not overlap at any quantile.
+The paper-rule spread across the $\tau$ grid (Fig.~\ref{fig:dssbox}) is
+$\approx 1.6\times$ interquartile, $\approx 3.7\times$ between the 5th and 95th
+percentiles --- comparable to one $\tau$ octave, which is exactly why the
+campaign pre-registered seed-paired estimators for the $\varepsilon$-response
+(below) and why unpaired CIs were declared under-powered.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/tcns_dss_dist.pdf}
-  \caption{Behind the fitted exponent: (a) per-run $D_{ss}$ CDFs by arm at
-  $\tau = 0.4$ (1584-run production record); (b) paper-rule spread across
-  seeds/formations per $\tau$. $D_{ss}$ is the stochastic steady-state
-  object [\conjtag{} regime] --- measured, not a test of
-  Thm.~\ref{thm:floorF}.}
+  \includegraphics[width=\linewidth]{figures/tcns_dss_cdf.pdf}
+  \caption{Per-run $D_{ss}$ CDFs by arm at $\tau = 0.4$ (1584-run production
+  record). $D_{ss}$ is the stochastic steady-state object [\conjtag{} regime]
+  --- measured, not a test of Thm.~\ref{thm:floorF}.}
   \label{fig:dssdist}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.82\linewidth]{figures/tcns_floor_dynamics.pdf}
+  \includegraphics[width=\linewidth]{figures/tcns_dss_box.pdf}
+  \caption{Paper-rule $D_{ss}$ spread across seeds and formations per $\tau$
+  ([\conjtag{}] regime).}
+  \label{fig:dssbox}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{figures/tcns_floor_dyn.pdf}
   \caption{The floor's dynamics: the disagreement $D(t)$ climbs from a
   perturbation to its steady state $D_{ss}$ (dots) over a sweep of staleness
   $\tau$, higher for larger $\tau$, inside the shaded evaluation window. This
@@ -256,16 +266,27 @@ ages), so it characterizes robustness rather than testing the theorem.
 \end{figure}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/f5_symmetry.pdf}
-  \caption{F5: amplitude (a) and closed-loop floor (b) $\varepsilon$-response,
-  never mixed in one panel.}
+  \includegraphics[width=\linewidth]{figures/tcns_f5_amp.pdf}
+  \caption{Symmetry, the amplitude object (C9b$'$): the departure from the
+  symmetric class is first-order in $\varepsilon$ (slope 1.006), the base
+  commutator exactly zero --- PASSED.}
   \label{fig:f5tc}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/tcns_f5_floor.pdf}
+  \caption{Symmetry, the closed-loop floor (C9b, [\conjtag{}] regime): the
+  seed-paired $\varepsilon$-exponent is $1.58$ at every $\tau$, excluding both
+  2 and 1 --- falsifier MET, a linear-plus-quadratic mixture the registered
+  single-power model mis-specifies. Never mixed with the amplitude object.}
+  \label{fig:f5floor}
 \end{figure}
 
 \subsection{Contraction in its own domain (E2; Thm.~\ref{thm:contractF})}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/f8_contraction.pdf}
+  \includegraphics[width=\linewidth]{figures/tcns_f8.pdf}
   \caption{F8: rate versus $\kappa\lambda_2$ across two topologies, slope
   1.40 (falsifier $< 0.5$); $\mu$ calibrated at $\kappa = 0$, so the identity
   line is anchored, not predicted; the nonlinear extension is open.}
@@ -274,13 +295,19 @@ ages), so it characterizes robustness rather than testing the theorem.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/tcns_contraction_portrait.pdf}
-  \caption{Contraction as trajectories. After a step perturbation, each
-  agent's gauge-complement error spirals into consensus (the origin) --- (a)
-  under the $C_5$ cycle, (b) under the more connected $K_5$, which converges
-  markedly faster. (c)~The decay rate scales with $\kappa\lambda_2$ (C6,
-  slope 1.403; LTV/frozen regime).}
+  \includegraphics[width=\linewidth]{figures/tcns_contraction_xy.pdf}
+  \caption{Contraction as trajectories: after a step perturbation, each
+  agent's gauge-complement error spirals into consensus (the origin), faster
+  under the more connected $K_5$ than the $C_5$ cycle (LTV/frozen regime).}
   \label{fig:contportrait}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/tcns_contraction_decay.pdf}
+  \caption{The gauge-complement decay: its rate scales with $\kappa\lambda_2$
+  (C6, slope 1.403), faster on the more connected graph.}
+  \label{fig:contdecay}
 \end{figure}
 Step-perturbing all agents and fitting the decay of the gauge complement:
 the rate scales with $\kappa\lambda_2$ at slope 1.403 across a $4\times$ gain
@@ -299,7 +326,7 @@ no exponent above is an artifact of the discretization
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.8\linewidth]{figures/tcns_dt_invariance.pdf}
+  \includegraphics[width=0.8\linewidth]{figures/tcns_dt.pdf}
   \caption{E10: the fitted exponent across a $10\times$ range of integrator
   steps; all CIs share the green band $[1.185, 1.256]$.}
   \label{fig:dtF}
@@ -324,16 +351,6 @@ multibody question and is answered negatively in the companion.
   Connectivity suppresses the floor $5\times$ at moderate $\tau$; the benefit
   collapses at high $\tau$.}
   \label{fig:topoF}
-\end{figure}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{figures/tcns_topology_gallery.pdf}
-  \caption{The four communication topologies at $N{=}6$, each with its
-  algebraic connectivity $\lambda_2$ and the measured floor $D_{ss}$ at
-  moderate and high staleness. More connectivity suppresses the floor at
-  moderate $\tau$; the benefit shrinks at high $\tau$ (exploratory, C10).}
-  \label{fig:topogallery}
 \end{figure}
 
 \subsection{Switch-off ladder and the transport-rule ablation}
@@ -372,7 +389,7 @@ suppressing it would misrepresent what $D_{ss}$ measures.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{figures/tcns_ladder_bars.pdf}
+  \includegraphics[width=0.9\linewidth]{figures/tcns_ladder.pdf}
   \caption{E3b transport-rule and control arms, median $D_{ss}$ by staleness
   [\conjtag{} object]. The Tier-1 A1-below-paper inversion is shown, not
   smoothed: $D_{ss}$ is a disagreement metric and never ranks rules ---
