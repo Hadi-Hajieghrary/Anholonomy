@@ -87,7 +87,8 @@ def draw(k):
                  fontsize=9)
 
 
-ani = animation.FuncAnimation(fig, draw, frames=N_FR, blit=False)
-out = os.path.join(RES, "level_set.mp4")
-ani.save(out, writer=animation.FFMpegWriter(fps=20, bitrate=1800))
-print("wrote", out)
+if __name__ == "__main__":                # guard so loop_path()/frame_pts import clean
+    ani = animation.FuncAnimation(fig, draw, frames=N_FR, blit=False)
+    out = os.path.join(RES, "level_set.mp4")
+    ani.save(out, writer=animation.FFMpegWriter(fps=20, bitrate=1800))
+    print("wrote", out)

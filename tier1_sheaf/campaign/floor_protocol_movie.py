@@ -129,7 +129,8 @@ def draw(f):
                  fontsize=9)
 
 
-ani = animation.FuncAnimation(fig, draw, frames=FRAMES, blit=False)
-out = os.path.join(RES, "floor_protocol.mp4")
-ani.save(out, writer=animation.FFMpegWriter(fps=25, bitrate=1800))
-print("wrote", out)
+if __name__ == "__main__":                # guard so run_traced()/runs import clean
+    ani = animation.FuncAnimation(fig, draw, frames=FRAMES, blit=False)
+    out = os.path.join(RES, "floor_protocol.mp4")
+    ani.save(out, writer=animation.FFMpegWriter(fps=25, bitrate=1800))
+    print("wrote", out)

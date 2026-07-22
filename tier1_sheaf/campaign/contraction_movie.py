@@ -105,7 +105,8 @@ def draw(k):
                  "slope 1.403; LTV/frozen hedge)", fontsize=9)
 
 
-ani = animation.FuncAnimation(fig, draw, frames=K_FR, blit=False)
-out = os.path.join(RES, "contraction.mp4")
-ani.save(out, writer=animation.FFMpegWriter(fps=15, bitrate=1800))
-print("wrote", out)
+if __name__ == "__main__":                # guard so run_traced()/data import clean
+    ani = animation.FuncAnimation(fig, draw, frames=K_FR, blit=False)
+    out = os.path.join(RES, "contraction.mp4")
+    ani.save(out, writer=animation.FFMpegWriter(fps=15, bitrate=1800))
+    print("wrote", out)

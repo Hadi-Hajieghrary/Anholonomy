@@ -92,7 +92,8 @@ def draw(k):
                  f"coefficient", fontsize=8.5, pad=8)
 
 
-ani = animation.FuncAnimation(fig, draw, frames=20 * HOLD, blit=False)
-out = os.path.join(RES, "formation_sweep.mp4")
-ani.save(out, writer=animation.FFMpegWriter(fps=10, bitrate=1800))
-print("wrote", out)
+if __name__ == "__main__":                # guard so forms/slopes/ampsets import clean
+    ani = animation.FuncAnimation(fig, draw, frames=20 * HOLD, blit=False)
+    out = os.path.join(RES, "formation_sweep.mp4")
+    ani.save(out, writer=animation.FFMpegWriter(fps=10, bitrate=1800))
+    print("wrote", out)

@@ -123,6 +123,26 @@ $\approx\tau^{1.08}$ for the stochastic closed-loop floor
   \label{fig:scenario}
 \end{figure}
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_transit_filmstrip.pdf}
+  \caption{The recorded transit, five ordered snapshots: the pentagon barge
+  towed by five ASVs on cables (coloured triangles) through the GNSS-denied
+  dogleg, with the load's ground-truth trail behind it. From the committed
+  multibody run (seed 3).}
+  \label{fig:filmstrip}
+\end{figure*}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.86\linewidth]{ral_cable_constraint.pdf}
+  \caption{Constraint satisfaction through the transit: the load-to-vessel
+  distances hold in the taut band (12\,m cable plus the barge attachment
+  radius) --- the distance-constraint cables never go slack, even through the
+  dogleg.}
+  \label{fig:cables}
+\end{figure}
+
 Each agent runs DIEKF-$\Sigma$: an invariant EKF on the load pose whose
 propagation uses the bias-corrected slaved twist through the cable geometry;
 whose direction channel is a Joseph-form scalar update with a broadside guard;
@@ -615,6 +635,18 @@ below.
 
 \begin{figure}[t]
   \centering
+  \includegraphics[width=\linewidth]{ral_gauge_orbit.pdf}
+  \caption{Cor.~5.2 in the closed loop, spatially. (a)~The five agents'
+  load-pose estimates (colours) stay a tight, consistent fleet but drift as a
+  group off the truth (black) through GNSS denial, then collapse toward it
+  once the dock beacon is acquired (solid $\to$ dashed). (b)~The fleet gauge
+  error grows to tens of metres and is killed by the single anchor. From the
+  committed \texttt{hero\_ghost\_tracks.npz} (seed 3).}
+  \label{fig:gaugeorbit}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
   \includegraphics[width=0.8\linewidth]{ral_agent_errors.pdf}
   \caption{Per-agent load-pose error at the 130\,s calibration horizon
   (recorded \texttt{hero\_series.npz}): the beacon at agent~0 (gold, from
@@ -667,6 +699,29 @@ trim-contamination hypothesis for the same effect was tested and falsified
   fleet mean on 11/12 seeds (gain starvation); best/median/worst marked,
   worst shown.}
   \label{fig:v2seeds}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_docking_zoom.pdf}
+  \caption{The docking outcome, honestly. (a)~At the dock (5\,m zoom), the
+  fleet's load-pose estimate sits about a metre from the truth barge centre,
+  outside the 0.5\,m spec ring. (b)~Across seeds, the decelerating approach
+  (v2) improves the fleet-mean dock error (median 0.61\,m) but 83\% of seeds
+  still miss the spec --- the approach geometry, not the estimator, binds.}
+  \label{fig:docking}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_baseline_divergence.pdf}
+  \caption{Why the sheaf transport is load-bearing. (a)~Fleet load-pose
+  estimate tracks: the DIEKF-$\Sigma$ (blue) follows the truth and is pinned
+  at the beacon, while B0 dead-reckoning (red) walks away. (b)~Fleet-mean
+  load error: the sheaf fusion propagates the single anchor to the whole
+  fleet at the dock, collapsing to $\sim$1\,m; dead-reckoning cannot, and
+  diverges (matching the 1.6\,m vs.\ 67\,m scorecard means).}
+  \label{fig:baseline}
 \end{figure}
 
 \subsection{The theorem's object, measured on both plants}

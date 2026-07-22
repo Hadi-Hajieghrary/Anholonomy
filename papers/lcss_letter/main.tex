@@ -34,6 +34,20 @@ theorem's claim.
 \end{abstract}
 
 \section{Introduction}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_graphical_abstract.pdf}
+  \caption{Visual summary. \emph{Problem:} cable-coupled agents fuse
+  delayed load-pose beliefs around a communication cycle. \emph{Mechanism:}
+  the composition of stale shape-dependent transports fails to close by the
+  holonomy of the constraint connection, $\tau^2[C_i,C_j]+O(\tau^3)$.
+  \emph{Result:} the amplitude is verified to coefficient precision (measured
+  slope 1.999; the $\tau^2$ law dotted), and every hypothesis-negating
+  switch-off sits at machine zero.}
+  \label{fig:abstract}
+\end{figure}
+
 When cable-coupled agents estimate a common load pose from purely local
 sensing --- each observing only its own odometry and its own cable --- their
 beliefs live in different body frames, and fusing them requires transporting
@@ -77,6 +91,22 @@ $\tau^2\|[C_i,C_j]\|$ to leading order.
 \section{Setting and main result}
 Let $g_L \in SE(2)$ be the load pose and $s_j = (\sigma, \sigma_i)$ agent
 $j$'s shape pair (cable direction in the load and body frames).
+Figure~\ref{fig:scene} shows the physical setting the floor lives in: the
+reduced cooperative-tow plant executing a persistent turn, so the shape fan
+keeps moving --- the theorem's standing hypothesis $\xi\ne0$, $\eta\ne0$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_transit_scene.pdf}
+  \caption{The cooperative-tow scenario. (a)~Geometry in the load frame: five
+  vessels on cables, each viewing the load through its own shape
+  $s_j=(\sigma_j,\sigma_{i,j})$ --- so the conjugated generators $C_j$ differ
+  and $[C_i,C_j]\neq0$, the source of the floor. (b)~The real cable-angle
+  trajectories $\sigma_j(t)$ from the reduced-plant run: the fan never stops
+  moving under the persistent turn, so the lagged transports carry a nonzero
+  twist and the floor is active. (Recorded run, seed 0.)}
+  \label{fig:scene}
+\end{figure}
 
 \begin{lemma}[Constraint trivialization]\label{lem:m}
 Agent $j$'s world pose is $g_j = g_L\, m(s_j)$ with
@@ -277,6 +307,29 @@ length $m > 2$ the leading coefficients $\alpha_k$ are combinatorial and are
 left open here (they are not needed for the $m{=}2$ result this letter
 verifies); no experiment below assumes them.
 
+Figure~\ref{fig:filmstrip} makes the mechanism and its null directions
+visible: the trail of a belief's frame origin as it is carried along the
+four legs $e^{\tau C_i}e^{\tau C_j}e^{-\tau C_i}e^{-\tau C_j}$. For a generic
+pair (left) the trail is a genuine loop that fails to close; the gap between
+its end and its start (red) is the holonomy, and it grows with $\tau$. For
+the level-set pair (right) the loop degenerates --- the belief travels out
+along the common generator and retraces exactly --- so it returns to the
+start at machine precision for every $\tau$. Supplementary movie S2 animates
+the same trail.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{lcss_loop_filmstrip.pdf}
+  \caption{The transported belief's trail around the stale fusion loop.
+  \emph{Left, generic pair:} the trail is a closed walk that does not close;
+  the red arrow is the holonomy gap, drawn for the largest $\tau$, and the
+  nested loops grow with $\tau\in\{0.4,0.8,1.2,1.6\}$. \emph{Right, level-set
+  pair ($C_i=C_j$):} the walk goes out and retraces, returning to the start
+  (gap $<10^{-15}$) at every $\tau$. The visible failure-to-close \emph{is}
+  the disagreement a stale round trip injects.}
+  \label{fig:filmstrip}
+\end{figure}
+
 \subsection{Measurement protocol}
 The amplitude is measured as $\|\mathrm{Log\,Hol}\|$ with dense matrix
 exponentials/logarithms (no leading-order shortcut), over
@@ -293,7 +346,23 @@ holonomy, growing quadratically alongside the traced amplitude law.
 
 \subsection{Extension experiments}
 Four further pre-registered arms complete the verification
-(Fig.~\ref{fig:ext}).
+(Fig.~\ref{fig:ext}). Figure~\ref{fig:carpet} first gives the whole picture
+in one field: the measured amplitude over a grid of staleness $\tau$ and
+shape separation $\Delta = \|s_j - s_i\|$. The floor deepens as $\tau^2$
+along the vertical, and along the horizontal it collapses into a sharp valley
+exactly at the level-set separation --- the two behaviours the arms below
+quantify.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{lcss_amplitude_carpet.pdf}
+  \caption{The floor as a field: $\log_{10}\|\log\mathrm{Hol}\|$ over
+  staleness $\tau$ (vertical, log) and shape separation $\Delta$ (horizontal,
+  along a ray through the level-set partner). The amplitude grows as $\tau^2$
+  and collapses in a narrow valley at the level-set separation (dashed) ---
+  the growth law and the protected class in a single view.}
+  \label{fig:carpet}
+\end{figure}
 
 \emph{(i) Formation invariance of the order.} Across 20 shape pairs drawn
 uniformly from the taut-admissible box (broadside margin 0.10), the fitted
@@ -336,7 +405,21 @@ shape has an isolated conjugation twin, not a continuous curve of them, and
 nowhere on the torus does the commutator vanish without the generators
 coinciding. This sharpens the observation: protection is all-or-nothing in
 shape space, and the ``valley'' visible in the heatmap is a finite-depth
-saddle everywhere except at the two exact zeros.
+saddle everywhere except at the two exact zeros. Figure~\ref{fig:landscape}
+renders the same fact as a surface: the commutator magnitude is bounded away
+from zero everywhere on the torus except at the two marked points (red
+stems), where it drops to machine precision.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{lcss_commutator_landscape.pdf}
+  \caption{The commutator surface $\log_{10}\|[C(s_{\mathrm{ref}}),C(s)]\|$
+  over the whole shape torus. It is bounded away from zero everywhere except
+  at two points (red stems, $s_{\mathrm{ref}}$ and its level partner) --- the
+  protected class is discrete, a strengthening of the coincident-shape
+  corollary that only a global search reveals.}
+  \label{fig:landscape}
+\end{figure}
 
 \begin{figure}[t]
   \centering
