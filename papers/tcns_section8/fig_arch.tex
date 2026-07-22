@@ -1,0 +1,37 @@
+% Tier-1 DIEKF-Sigma pipeline (editable TikZ). \input inside a figure* env.
+% Requires: \usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\begin{tikzpicture}[
+  >=Latex, font=\scriptsize,
+  blk/.style={draw, rounded corners=2pt, align=center, inner sep=3pt,
+              minimum height=9mm, text width=17mm},
+  sens/.style={blk, fill=blue!7, draw=blue!45},
+  est/.style={blk, fill=orange!10, draw=orange!60!black},
+  fuse/.style={blk, fill=green!12, draw=green!55!black, text width=22mm},
+  ext/.style={blk, fill=violet!10, draw=violet!55!black},
+  bcn/.style={blk, fill=magenta!10, draw=magenta!55!black},
+  outp/.style={blk, fill=black!6, draw=black!45, text width=13mm},
+  ar/.style={->, thick, draw=black!55}]
+
+  \node[sens] (odo) {odometry 50\,Hz};
+  \node[sens, below=8mm of odo] (dir) {cable direction 20\,Hz};
+  \node[est, right=13mm of odo] (prop) {left-invariant propagate (slaved twist)};
+  \node[est, right=13mm of dir] (upd) {direction update $\kappa_{dir}$};
+  \node[fuse, right=15mm of $(prop)!0.5!(upd)$] (fuse)
+        {sheaf fusion $\rho{=}\mathrm{Ad}_m\!\circ\!\pi_L$, weights $w_e$, age $\tau$};
+  \node[ext, above=9mm of fuse] (nbr) {neighbour packets, $\tau$-stale};
+  \node[bcn, below=9mm of fuse] (bcn) {beacon (1 agent), Cor.~5.2};
+  \node[outp, right=14mm of fuse] (out) {$\hat G_j$};
+
+  \draw[ar] (odo) -- (prop); \draw[ar] (dir) -- (upd);
+  \draw[ar] (prop.east) -| (fuse.north);
+  \draw[ar] (upd.east) -| (fuse.south);
+  \draw[ar] (nbr.south) -- (fuse.north);
+  \draw[ar] (bcn.north) -- (fuse.south);
+  \draw[ar] (fuse.east) -- (out.west);
+
+  \node[align=left, font=\scriptsize, text width=110mm, anchor=north west]
+    at ($(bcn.south west)+(-20mm,-3mm)$)
+    {LOCAL sensing (odometry, cable direction) $\cdot$ $\tau$-stale SHARED
+     neighbour estimates on the graph $\cdot$ one ABSOLUTE beacon at one agent
+     (nothing else touches truth --- linted).};
+\end{tikzpicture}

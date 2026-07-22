@@ -2,6 +2,7 @@
 % Theory-statement blocks marked %% AUTHOR: pull from refs/estimation_sheaf.tex.
 \documentclass[letterpaper, 10pt, journal]{IEEEtran}
 \usepackage{graphicx, amsmath, amssymb, booktabs, amsthm}
+\usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
 \newtheorem{theorem}{Theorem}\newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newcommand{\provtag}{\textsc{[proven]}}
@@ -165,7 +166,7 @@ happens when it is violated, which is precisely the switch-off ladder.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{theorem_map.pdf}
+  \resizebox{\linewidth}{!}{\input{fig_thmmap.tex}}
   \caption{Statement-dependency map and proof roadmap of the full theory,
   drawn with the companion's numbering (the letter's own results appear as
   Lem~3.1 $=$ Lemma~\ref{lem:m}, Lem~7.1 $=$ Lemma~\ref{lem:bch}, Thm~7.2

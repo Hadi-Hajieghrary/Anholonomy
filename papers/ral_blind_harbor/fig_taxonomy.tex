@@ -1,0 +1,23 @@
+% Failure/limit taxonomy (editable TikZ). \input inside a figure* environment.
+% Requires: \usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\begin{tikzpicture}[
+  >=Latex, font=\scriptsize,
+  card/.style={draw, rounded corners=2pt, align=center, inner sep=3pt,
+               text width=30mm, minimum height=8mm},
+  find/.style={card, fill=red!7, draw=red!55},
+  cause/.style={card, fill=orange!9, draw=orange!60!black},
+  fix/.style={card, fill=green!9, draw=green!55!black},
+  ar/.style={->, thick, draw=black!45}]
+  \def\dx{34mm}
+  \foreach \i/\head/\cause/\fix in {
+    0/{docking spec unmet (0\% $<$0.5\,m)}/{approach geometry binds}/{decel approach (necessary)},
+    1/{anchored gain starvation (11/12)}/{covariance collapses $\to$ gain starves}/{cov.\ floor / adaptive $R$},
+    2/{ANEES non-transfer (159--229 @450\,s)}/{bias RW growth $>$ declared $Q$}/{horizon-scoped claims},
+    3/{broadside guard unexercised}/{$\hat\sigma_i$ lags true broadside}/{lag-aware margin}} {
+      \node[find]  (f\i) at ({\i*\dx},0)     {\head};
+      \node[cause] (c\i) at ({\i*\dx},-1.55) {\emph{cause:} \cause};
+      \node[fix]   (x\i) at ({\i*\dx},-3.0)  {\emph{remedy:} \fix};
+      \draw[ar] (f\i) -- (c\i);
+      \draw[ar] (c\i) -- (x\i);
+  }
+\end{tikzpicture}

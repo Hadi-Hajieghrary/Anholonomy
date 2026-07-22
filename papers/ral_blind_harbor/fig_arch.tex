@@ -1,0 +1,46 @@
+% DIEKF-Sigma architecture (editable TikZ). \input inside a figure* environment.
+% Requires: \usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\begin{tikzpicture}[
+  >=Latex, font=\scriptsize,
+  blk/.style={draw, rounded corners=2pt, align=center, inner sep=3pt,
+              minimum height=9mm, text width=16mm},
+  plant/.style={blk, fill=brown!12, draw=brown!55!black},
+  est/.style={blk, fill=orange!10, draw=orange!60!black},
+  fuse/.style={blk, fill=green!12, draw=green!55!black, text width=20mm},
+  ext/.style={blk, fill=violet!10, draw=violet!55!black},
+  bcn/.style={blk, fill=magenta!10, draw=magenta!55!black},
+  outp/.style={blk, fill=black!6, draw=black!45, text width=13mm},
+  ar/.style={->, thick, draw=black!55}]
+
+  \node[plant] (barge) {barge $+N$ ASVs, cables, tension};
+  \node[plant, below=8mm of barge] (drag) {HydroDrag $+$ Thruster};
+  \node[est, right=14mm of $(barge)!0.5!(drag)$] (sens)
+        {sensor models: odom/dir/beacon};
+  \node[est, right=14mm of sens, yshift=9mm] (prop) {InEKF propagate (slaved twist)};
+  \node[est, right=14mm of sens, yshift=-9mm] (upd) {direction update $+$ guard};
+  \node[fuse, right=16mm of $(prop)!0.5!(upd)$] (fuse)
+        {executed-composite fusion (frozen-shape exact)};
+  \node[ext, above=9mm of fuse] (comms) {comms (drops, jitter)};
+  \node[bcn, below=9mm of fuse] (bcn) {beacon (agent 0), Cor.~5.2};
+  \node[outp, right=14mm of fuse] (out) {$\hat G_i$, CI cov.};
+
+  \draw[ar] (barge.east) -| ($(sens.west)+(-4mm,4mm)$) -- ($(sens.west)+(0,4mm)$);
+  \draw[ar] (drag.east) -| ($(sens.west)+(-4mm,-4mm)$) -- ($(sens.west)+(0,-4mm)$);
+  \draw[ar] (sens.east) |- (prop.west);
+  \draw[ar] (sens.east) |- (upd.west);
+  \draw[ar] (prop.east) -| (fuse.north);
+  \draw[ar] (upd.east) -| (fuse.south);
+  \draw[ar] (comms.south) -- (fuse.north);
+  \draw[ar] (bcn.north) -- (fuse.south);
+  \draw[ar] (fuse.east) -- (out.west);
+
+  \begin{scope}[on background layer]
+    \node[fit=(barge)(drag), draw=brown!30, fill=brown!5, rounded corners,
+          inner sep=7pt] (pz) {};
+    \node[fit=(prop)(upd)(fuse)(comms)(bcn)(out), draw=green!25, fill=green!3,
+          rounded corners, inner sep=7pt] (ez) {};
+  \end{scope}
+  \node[brown!45!black, font=\scriptsize, above=1pt of pz.north] {PLANT (Drake)};
+  \node[green!45!black, font=\scriptsize, above=1pt of ez.north]
+        {ESTIMATOR (sensors only; truth-isolation linted)};
+\end{tikzpicture}

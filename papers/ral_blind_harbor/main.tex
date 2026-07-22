@@ -2,6 +2,7 @@
 % docs/ral_package.md; every number traceable via campaign_replay.py)
 \documentclass[letterpaper, 10pt, journal]{IEEEtran}
 \usepackage{graphicx, amsmath, amssymb, booktabs, amsthm}
+\usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
 \newtheorem{theorem}{Theorem}\newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}\newtheorem{definition}{Definition}
 \newcommand{\provtag}{\textsc{[proven]}}
@@ -103,12 +104,11 @@ receives a docking beacon (5\,Hz full load pose,
 $\sigma = (5\,\mathrm{cm}, 5\,\mathrm{cm}, 0.5^\circ)$) in the final
 approach. Packets circulate on the $C_N$ cycle with staleness $\tau$.
 
-Figure~\ref{fig:scenario} fixes the task and the information problem in one
-view: panel (a) the dogleg channel, the tow, and the range-limited docking
-beacon --- absolute information exists \emph{only} near the dock, and only at
-one vessel; panel (b) the staleness ladder the estimator actually lives on,
-from 50\,Hz local sensing down to the $\tau$-stale neighbor channel that is
-the paper's central variable. The price of that staleness is the paper's
+Figure~\ref{fig:scenario} fixes the task: the dogleg channel, the tow, and the
+range-limited docking beacon --- absolute information exists \emph{only} near
+the dock, and only at one vessel. Figure~\ref{fig:staleness} is the staleness
+ladder the estimator actually lives on, from 50\,Hz local sensing down to the
+$\tau$-stale neighbor channel that is the paper's central variable. The price of that staleness is the paper's
 subject: proven $\tau^2$ at the error-transport level, measured
 $\approx\tau^{1.08}$ for the stochastic closed-loop floor
 (\conjtag{} regime).
@@ -116,26 +116,32 @@ $\approx\tau^{1.08}$ for the stochastic closed-loop floor
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{ral_scenario.pdf}
-  \caption{(a)~The Blind Harbor Transit: a GNSS-denied dogleg channel, one
-  range-limited docking beacon at one vessel. (b)~The information-staleness
-  ladder: local sensing is fast, shared estimates are $\tau$-stale, absolute
-  fixes exist only at the dock.}
+  \caption{The Blind Harbor Transit: a GNSS-denied dogleg channel, with one
+  range-limited docking beacon at a single vessel.}
   \label{fig:scenario}
 \end{figure}
 
-\begin{figure*}[t]
+\begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_transit_filmstrip.pdf}
-  \caption{The recorded transit, five ordered snapshots: the pentagon barge
-  towed by five ASVs on cables (coloured triangles) through the GNSS-denied
-  dogleg, with the load's ground-truth trail behind it. From the committed
-  multibody run (seed 3).}
-  \label{fig:filmstrip}
-\end{figure*}
+  \includegraphics[width=\linewidth]{ral_staleness.pdf}
+  \caption{The information-staleness ladder: local sensing is fast, shared
+  estimates are $\tau$-stale, absolute fixes exist only at the dock.}
+  \label{fig:staleness}
+\end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.86\linewidth]{ral_cable_constraint.pdf}
+  \includegraphics[width=\linewidth]{ral_transit.pdf}
+  \caption{The recorded transit: the pentagon barge towed by five ASVs on
+  cables (coloured triangles) through the GNSS-denied dogleg, drawn at five
+  instants along its ground-truth trail. From the committed multibody run
+  (seed 3).}
+  \label{fig:filmstrip}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_cables.pdf}
   \caption{Constraint satisfaction through the transit: the load-to-vessel
   distances hold in the taut band (12\,m cable plus the barge attachment
   radius) --- the distance-constraint cables never go slack, even through the
@@ -328,15 +334,15 @@ diagram: no estimator input port can reach plant state except through a
 declared sensor. Commands are truth-free by construction. Every subsection
 below fills in one block of this figure.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_architecture.pdf}
+  \input{fig_arch.tex}
   \caption{DIEKF-$\Sigma$ as executed, with the linted plant/estimator
   boundary. Per agent: invariant propagation through the slaved twist,
   direction updates with the broadside guard, executed-composite delayed
   fusion with CI covariance handling, and (one agent) the beacon channel.}
   \label{fig:arch}
-\end{figure}
+\end{figure*}
 
 \subsection{Geometry, trivialization, and state}
 Work on $SE(2)$ with elements $g = (R(\theta), p)$, exponential
@@ -567,25 +573,13 @@ hero v1/v2 & transit; decel remedy & Fig.~\ref{fig:heroseries},
 \subsection{Gauge pinning (Cor.~5.2 in closed loop)}
 Through 400\,s of GNSS denial the five per-agent estimates drift as one rigid
 gauge orbit --- kernel-projected error grows unbounded while the complement
-stays two orders smaller (Thm~5.1's structure; Fig.~\ref{fig:montage} and
+stays two orders smaller (Thm~5.1's structure; Figs.~\ref{fig:gaugeorbit},~\ref{fig:heroD} and
 supplementary videos S1--S2). At beacon acquisition the disagreement
 \emph{spikes}: the anchored agent snaps toward truth while its neighbors still
 carry the drifted gauge, and the pin propagates at the network diffusion rate
 ($\tau_{\mathrm{net}} \approx 21$\,s for one 5\,Hz anchor on $C_5$). The
 docking scorecard (Table~\ref{tab:scorecard}) reports anchored, fleet-mean,
 and fleet-max rows without selection.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{hero_montage.png}
-  \caption{Three phases of the GNSS-denied transit (supplementary video S2).
-  Left: gauge free --- the five ghost caissons (each agent's own load estimate)
-  drift \emph{coherently}, overlapping each other while offset from truth.
-  Middle: the beacon pins one agent; the fleet is mid-convergence. Right:
-  converged through the turn. Single illustrative run, median-$D_{ss}$ seed by
-  the documented selection rule.}
-  \label{fig:montage}
-\end{figure}
 
 \begin{table}[t]
 \centering
@@ -610,10 +604,10 @@ B0 (dead-reckon) & 1.25 & 66.7 & 134.1 & 9624 & 43.8 \\
 
 Figure~\ref{fig:heroseries} grounds the narrative in the recorded transit
 itself: the truth trajectory of barge and vessels through the two legs and
-the $60^\circ$ turn, and the two observables whose separation is the paper's
-point --- disagreement $D(t)$, which the maneuver excites and staleness
-floors, and the gauge-kernel component, which grows unbounded through
-GNSS denial and is killed \emph{only} by the beacon. The $D(t)$ spike at
+the $60^\circ$ turn. Figure~\ref{fig:heroD} then plots the two observables
+whose separation is the paper's point --- disagreement $D(t)$, which the
+maneuver excites and staleness floors, and the gauge-kernel component, which
+grows unbounded through GNSS denial and is killed \emph{only} by the beacon. The $D(t)$ spike at
 acquisition is not an artifact: it is the pin shock, the anchored agent
 snapping to truth against a fleet still carrying the drifted gauge --- the
 same consensus-stiffness mechanism that D9 finds anti-ordering re-lock with
@@ -624,25 +618,39 @@ below.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_hero_series.pdf}
-  \caption{The recorded 450\,s dogleg transit (from the committed
-  \texttt{hero\_dogleg\_series.npz}). (a)~Truth: barge + 5 vessels, turn and
-  beacon windows marked. (b)~Disagreement $D(t)$ vs.\ the gauge-kernel
-  component: the maneuver excites the former; only the beacon kills the
-  latter; the acquisition spike in $D$ is the pin shock.}
+  \includegraphics[width=\linewidth]{ral_hero_traj.pdf}
+  \caption{The recorded 450\,s dogleg transit truth (from the committed
+  \texttt{hero\_dogleg\_series.npz}): barge trajectory with the turn and
+  beacon windows marked.}
   \label{fig:heroseries}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_gauge_orbit.pdf}
-  \caption{Cor.~5.2 in the closed loop, spatially. (a)~The five agents'
-  load-pose estimates (colours) stay a tight, consistent fleet but drift as a
-  group off the truth (black) through GNSS denial, then collapse toward it
-  once the dock beacon is acquired (solid $\to$ dashed). (b)~The fleet gauge
-  error grows to tens of metres and is killed by the single anchor. From the
-  committed \texttt{hero\_ghost\_tracks.npz} (seed 3).}
+  \includegraphics[width=\linewidth]{ral_hero_D.pdf}
+  \caption{Disagreement $D(t)$ vs.\ the gauge-kernel component along the same
+  transit: the maneuver excites the former; only the beacon kills the latter;
+  the acquisition spike in $D$ is the pin shock.}
+  \label{fig:heroD}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_gauge_trails.pdf}
+  \caption{Cor.~5.2 in the closed loop, spatially: the five agents' load-pose
+  estimates (colours) stay a tight, consistent fleet but drift as a group off
+  the truth (black) through GNSS denial, then collapse toward it once the dock
+  beacon is acquired (solid $\to$ dashed). From the committed
+  \texttt{hero\_ghost\_tracks.npz} (seed 3).}
   \label{fig:gaugeorbit}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_gauge_err.pdf}
+  \caption{The fleet gauge error (mean estimate vs.\ truth) grows to tens of
+  metres under GNSS denial and is killed by the single dock anchor.}
+  \label{fig:gaugeerr}
 \end{figure}
 
 \begin{figure}[t]
@@ -682,17 +690,24 @@ trim-contamination hypothesis for the same effect was tested and falsified
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_scorecard_stats.pdf}
-  \caption{The 50-transit scorecard at distribution level. (a)~Fleet-mean
-  dock error per arm (log scale --- B0's failure is two orders, not a tail).
-  (b)~Per-seed CDFs: the ordering holds seed-wise; the 0.5\,m spec (dotted)
-  is left of every support. Seed-paired win counts in the strip.}
+  \includegraphics[width=\linewidth]{ral_score_box.pdf}
+  \caption{The 50-transit scorecard: fleet-mean dock error per arm (log scale
+  --- B0's failure is two orders, not a tail).}
   \label{fig:scorestats}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{ral_v2_seeds.pdf}
+  \includegraphics[width=\linewidth]{ral_score_cdf.pdf}
+  \caption{Per-seed CDFs of the fleet-mean dock error: the ordering
+  B1$^{\mathrm{lim}} > $ paper $>$ B2 $\gg$ B0 holds seed-wise; the 0.5\,m
+  spec is left of every support (0\% success at plan-faithful acquisition).}
+  \label{fig:scorecdf}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{ral_v2seeds.pdf}
   \caption{Hero v2 (decelerating approach), all 12 seeds sorted: fleet-mean
   vs.\ anchored-agent dock error. Median 0.61\,m, 17\% under spec ---
   improvement without sufficiency; the anchored agent is worse than the
@@ -704,30 +719,44 @@ trim-contamination hypothesis for the same effect was tested and falsified
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{ral_docking_zoom.pdf}
-  \caption{The docking outcome, honestly. (a)~At the dock (5\,m zoom), the
-  fleet's load-pose estimate sits about a metre from the truth barge centre,
-  outside the 0.5\,m spec ring. (b)~Across seeds, the decelerating approach
-  (v2) improves the fleet-mean dock error (median 0.61\,m) but 83\% of seeds
-  still miss the spec --- the approach geometry, not the estimator, binds.}
+  \caption{The docking outcome at the dock (5\,m zoom): the fleet's load-pose
+  estimate sits about a metre from the truth barge centre, outside the 0.5\,m
+  spec ring.}
   \label{fig:docking}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_baseline_divergence.pdf}
-  \caption{Why the sheaf transport is load-bearing. (a)~Fleet load-pose
-  estimate tracks: the DIEKF-$\Sigma$ (blue) follows the truth and is pinned
-  at the beacon, while B0 dead-reckoning (red) walks away. (b)~Fleet-mean
-  load error: the sheaf fusion propagates the single anchor to the whole
-  fleet at the dock, collapsing to $\sim$1\,m; dead-reckoning cannot, and
-  diverges (matching the 1.6\,m vs.\ 67\,m scorecard means).}
+  \includegraphics[width=\linewidth]{ral_docking_cdf.pdf}
+  \caption{Across seeds, the decelerating approach (v2) improves the
+  fleet-mean dock error (median 0.61\,m) but 83\% of seeds still miss the
+  0.5\,m spec --- the approach geometry, not the estimator, binds.}
+  \label{fig:dockingcdf}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_baseline_tracks.pdf}
+  \caption{Why the sheaf transport is load-bearing: fleet load-pose estimate
+  tracks. The DIEKF-$\Sigma$ (blue) follows the truth and is pinned at the
+  beacon; B0 dead-reckoning (red) walks away.}
   \label{fig:baseline}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_baseline_err.pdf}
+  \caption{Fleet-mean load error: the sheaf fusion propagates the single
+  anchor to the whole fleet at the dock, collapsing to $\sim$1\,m;
+  dead-reckoning cannot, and diverges (matching the 1.6 vs.\ 67\,m scorecard
+  means).}
+  \label{fig:baselineerr}
 \end{figure}
 
 \subsection{The theorem's object, measured on both plants}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{f4a_overlay.pdf}
+  \includegraphics[width=\linewidth]{ral_f4a.pdf}
   \caption{Error-transport holonomy amplitude on both plants. Thm~7.2
   (leading-order, deterministic): Tier-1 slope 1.999 with switch-offs at machine
   zero; Drake slope 2.000 with the $m{=}2$ coefficient check at 1.0000, the
@@ -740,7 +769,7 @@ trim-contamination hypothesis for the same effect was tested and falsified
 \subsection{The closed-loop floor: the conjecture falsified, coherently}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{f4b_overlay.pdf}
+  \includegraphics[width=\linewidth]{ral_f4b.pdf}
   \caption{Tier-1/Tier-2 agreement on the conjectured steady-state floor
   ([ES~\S10(ii)]). The leading-order, deterministic holonomy amplitude of
   Thm~7.2 is tested separately in Fig.~\ref{fig:f4a}. With $D_0$ measured in situ by
@@ -756,7 +785,7 @@ trim-contamination hypothesis for the same effect was tested and falsified
 \subsection{Variance attribution: what makes up disagreement}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{f4c_variance_attribution.pdf}
+  \includegraphics[width=\linewidth]{ral_f4c.pdf}
   \caption{All Drake arms on matched formation draws. Ablating the conjugated
   transport (A2) runs $1.7\times\!\to\!8.2\times$ above the paper rule with
   growing $\tau$; naive consensus (A1) holds disagreement flat and low---by
@@ -769,15 +798,21 @@ trim-contamination hypothesis for the same effect was tested and falsified
 \subsection{Symmetry: protection lives on the amplitude object}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{f5_symmetry.pdf}
-  \caption{Two objects, two panels, never mixed. (a)~The amplitude departure
-  from the symmetric class is first-order in $\varepsilon$ (measured 1.006,
-  base commutator exactly zero). (b)~The closed-loop floor excess: the
-  seed-paired estimator gives slope 1.58 [1.44, 1.84] at every $\tau$ ---
-  excluding both the conjectured 2 and 1; segment slopes rise 1.2\,$\to$\,2.1
-  up the ladder, consistent with a linear-plus-quadratic mixture that the
-  registered single-power model mis-specifies.}
+  \includegraphics[width=\linewidth]{tcns_f5_amp.pdf}
+  \caption{Symmetry, the amplitude object: the departure from the symmetric
+  class is first-order in $\varepsilon$ (measured 1.006, base commutator
+  exactly zero) --- PASSED.}
   \label{fig:f5}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{tcns_f5_floor.pdf}
+  \caption{Symmetry, the closed-loop floor [\conjtag{}]: the seed-paired
+  estimator gives slope 1.58 [1.44, 1.84] at every $\tau$, excluding both 2
+  and 1 --- a linear-plus-quadratic mixture the registered single-power model
+  mis-specifies. Never mixed with the amplitude object.}
+  \label{fig:f5floor}
 \end{figure}
 The symmetric class suppresses the \emph{amplitude} object strongly
 ($31\times$ at Drake's achieved-$\varepsilon$; exactly on Tier-1) but the
@@ -800,7 +835,7 @@ plants; maneuvering amplitudes do not.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{d9_topology.pdf}
+  \includegraphics[width=\linewidth]{ral_d9.pdf}
   \caption{Connectivity buys agreement, not anchoring. The pre-anchor floor
   improves with $\lambda_2$ (a); single-anchor pinning is anchor-rate-limited
   (b, Spearman $+0.04$); re-agreement around the pin \emph{anti}-orders with
@@ -813,7 +848,7 @@ plants; maneuvering amplitudes do not.
 \subsection{Numerics defense}
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{f8_contraction.pdf}
+  \includegraphics[width=\linewidth]{tcns_f8.pdf}
   \caption{Contraction in its own domain (frozen, unanchored): rate versus
   $\kappa\lambda_2$ across two topologies, slope 1.40 (falsifier $< 0.5$);
   $\mu$ calibrated at $\kappa = 0$, so the identity line is anchored, not
@@ -831,11 +866,11 @@ verified genuine by direct truth-trajectory differencing, 1.35\,mm over
 \subsection{Robustness outside the protocol class (D10)}
 Figure~\ref{fig:robust} characterizes degradation outside protocol class
 $\mathcal{P}$ --- pre-registered as characterization, with red-flag rules
-rather than falsifiers. Panel (a): under packet drops the floor degrades
+rather than falsifiers. Figure~\ref{fig:robust}: under packet drops the floor degrades
 gracefully, $+13\%$ at $p = 0.1$ and $+45\%$ at $p = 0.3$ (the jitter arm is
 milder), with the anchored ANEES still in-gate at $p = 0.3$ (4.23, at the
 130\,s horizon --- the horizon travels with the number). No red flags fired.
-Panel (b) reports a null with a mechanism: the broadside guard was never
+Figure~\ref{fig:guard} reports a null with a mechanism: the broadside guard was never
 exercised in the paired gust campaign because its trigger --- the
 \emph{estimated} cable angle $\hat\sigma_i$ --- lags true broadside
 throughout the reachable envelope (closest approach: true 0.027 vs.\
@@ -845,14 +880,21 @@ recorded design note (a lag-aware margin) is the honest deliverable.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_robustness.pdf}
-  \caption{D10 robustness characterization (outside class $\mathcal{P}$).
-  (a)~Floor vs.\ packet-drop probability, drops-only and drops+jitter arms
-  (8 seeds each; mean $\pm$ sd): graceful, no red flags; anchored ANEES
-  in-gate at $p{=}0.3$ at the 130\,s horizon. (b)~Why the broadside guard
-  never fired: $\hat\sigma_i$ lags true broadside across the reachable gust
-  envelope --- ON $\equiv$ OFF, reported as a null with its mechanism.}
+  \includegraphics[width=\linewidth]{ral_robust_drops.pdf}
+  \caption{D10(b) robustness (outside class $\mathcal{P}$): floor vs.\
+  packet-drop probability, drops-only and drops+jitter arms (8 seeds each;
+  mean $\pm$ sd) --- graceful, no red flags; anchored ANEES in-gate at
+  $p{=}0.3$ at the 130\,s horizon.}
   \label{fig:robust}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{ral_robust_guard.pdf}
+  \caption{D10(c): why the broadside guard never fired --- $\hat\sigma_i$
+  lags true broadside across the reachable gust envelope, so ON $\equiv$ OFF.
+  Reported as a null with its mechanism.}
+  \label{fig:guard}
 \end{figure}
 
 \subsection{The adjudicated ledger, in one figure}
@@ -894,7 +936,7 @@ closed-loop floor between them.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{f4_cross_tier_overlay.pdf}
+  \includegraphics[width=\linewidth]{ral_cross_tier.pdf}
   \caption{The epistemic spine in one overlay: three distinct objects, three
   measured exponents --- Tier-1 $\|\mathrm{Log\,Hol}\|$ ($p = 2.00$, the
   theorem's object, \provtag); the Drake round-trip transport defect
@@ -956,15 +998,14 @@ is the recorded design note. Slack-cable events are outside this plant's
 validity domain (bilateral distance constraints), scoped to future work with
 unilateral cables.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
-  \includegraphics[width=\linewidth]{ral_failure_taxonomy.pdf}
+  \input{fig_taxonomy.tex}
   \caption{Failure and limit taxonomy: each adverse finding with its
-  measured cause and recorded remedy class. Tested-and-falsified remedy
-  hypotheses (the m$_\xi$-trim freeze) are stated inside the cause cards.
+  measured cause and recorded remedy class.
   Table~\ref{tab:failure} adds frequency, severity, and detection.}
   \label{fig:taxonomy}
-\end{figure}
+\end{figure*}
 
 \begin{table}[t]
 \centering

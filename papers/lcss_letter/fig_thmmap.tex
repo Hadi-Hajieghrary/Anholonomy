@@ -1,0 +1,35 @@
+% Statement-dependency map / proof roadmap (editable TikZ). \input in a figure.
+% Requires: \usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\begin{tikzpicture}[
+  >=Latex, font=\scriptsize, x=15mm, y=9mm,
+  n/.style={draw, rounded corners=2pt, align=center, inner sep=2.5pt,
+            minimum height=6.5mm, text width=15mm},
+  prov/.style={n, fill=green!9, draw=green!55!black},
+  def/.style={n, fill=black!5, draw=black!45},
+  conj/.style={n, fill=red!7, draw=red!60, dashed},
+  ar/.style={->, draw=black!50},
+  arc/.style={->, draw=red!55, dashed}]
+
+  \node[prov] (l31) at (0,2)  {Lem 3.1\\trivialization};
+  \node[prov] (l32) at (0,0)  {Lem 3.2\\edge maps};
+  \node[prov] (l71) at (0,-2) {Lem 7.1\\BCH};
+  \node[def]  (shf) at (2,1)  {estimation sheaf $\rho{=}\mathrm{Ad}_m\pi_L$};
+  \node[prov] (t51) at (4,2.5){Thm 5.1\\gauge $\ker L_F{\cong}\mathfrak{se}(2)$};
+  \node[prov] (t63) at (4,0.6){Thm 6.3\\contraction};
+  \node[prov] (t72) at (4,-2) {Thm 7.2\\floor $\tau^2[C,C']$};
+  \node[prov] (c52) at (6,3)  {Cor 5.2\\pinning};
+  \node[prov] (c73) at (6,-1) {Cor 7.3\\symmetry};
+  \node[conj] (dss) at (6,-3) {$D_{ss}$ floor (sharp const.)};
+
+  \draw[ar] (l31) -- (shf); \draw[ar] (l32) -- (shf);
+  \draw[ar] (shf) -- (t51); \draw[ar] (shf) -- (t63); \draw[ar] (shf) -- (t72);
+  \draw[ar] (l71) -- (t72);
+  \draw[ar] (t51) -- (c52); \draw[ar] (t72) -- (c73);
+  \draw[arc] (t72) -- (dss);
+
+  \node[align=left, font=\scriptsize, text width=52mm] at (3,-4.4)
+    {\textcolor{green!45!black}{green}: proven (proof/sketch here) $\cdot$
+     grey: sheaf construction $\cdot$
+     \textcolor{red!60}{dashed red}: conjectural $D_{ss}$ --- a different
+     object from the Thm 7.2 amplitude, and falsified at these scales (see text).};
+\end{tikzpicture}
