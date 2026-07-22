@@ -92,25 +92,35 @@ def fig_gauge_errors():
     out(fig, "tcns_gauge_errors")
 
 
-# --- E1 spectrum -----------------------------------------------------------
+# --- E1 spectrum (REAL sheaf Laplacian; no fabricated fallback) -------------
 def fig_e1_spectrum():
-    from tier1_sheaf.core.shapes import Ad_m
+    # Genuine gauge spectrum, computed from the sheaf Laplacian on the triangle
+    # config of tier1_sheaf/experiments/e1_gauge.py (which asserts dim ker = 3).
+    # No hardcoded fallback: if the operator regresses, the asserts fail loudly
+    # rather than shipping fabricated eigenvalues.
     from tier1_sheaf.sheaf.laplacian import sheaf_laplacian
-    try:
-        shapes = np.array([[-0.4, -0.4], [0.1, 0.15], [0.45, -0.2]])
-        L = sheaf_laplacian(shapes, edges=[(0, 1), (1, 2), (2, 0)])
-        ev = np.sort(np.linalg.eigvalsh(L))
-    except Exception:
-        ev = np.concatenate([np.zeros(3), np.array([2.1, 2.4, 3.0, 3.3, 4.1, 5.5])])
+    SHAPES = [(0.4, 0.3), (0.9, -0.5), (-0.7, 0.6)]
+    EDGES = [(0, 1), (1, 2), (2, 0)]
+    L, _, _ = sheaf_laplacian(SHAPES, EDGES, weights=[1.0, 1.0, 1.0], l=1.0)
+    ev = np.sort(np.linalg.eigvalsh(L))
+    Lp = L.copy(); Lp[0:3, 0:3] += 1.0 * np.eye(3)   # Cor. pinning: one full-rank anchor
+    evp = np.sort(np.linalg.eigvalsh(Lp))
+    assert int((np.abs(ev) < 1e-9).sum()) == 3, "E1: gauge kernel dim != 3"
+    assert int((np.abs(evp) < 1e-9).sum()) == 0, "E1: anchor did not remove the gauge"
     fig, ax = F()
-    ax.bar(np.arange(len(ev)), np.maximum(ev, 1e-16), color=color(0),
-           edgecolor="k", lw=0.4)
-    ax.axhline(0, color="k", lw=0.6)
-    ax.annotate("$\\dim\\ker=3$\n(the $SE(2)$ gauge)", (1, ev[4] * 0.5),
-                fontsize=6.5)
-    ax.set_yscale("symlog", linthresh=1e-3)
-    ax.set_xlabel("eigenvalue index"); ax.set_ylabel("$\\lambda(L_\\mathcal{F})$")
-    ax.set_title("E1 gauge spectrum: three exact zeros")
+    idx = np.arange(len(ev)); flo = 1e-16
+    ax.bar(idx - 0.19, np.maximum(ev, flo), width=0.38, color=color(0),
+           edgecolor="k", lw=0.3, label="unanchored")
+    ax.bar(idx + 0.19, np.maximum(evp, flo), width=0.38, color=color(1),
+           edgecolor="k", lw=0.3, label="one anchor (Cor.)")
+    ax.set_yscale("log"); ax.set_ylim(1e-17, 30)
+    ax.axhspan(1e-17, 1e-11, color="0.88", zorder=0)
+    ax.annotate("$\\dim\\ker L_\\mathcal{F}=3$\n(the $SE(2)$ gauge)", (-0.2, 4e-14),
+                fontsize=6, va="center", ha="left")
+    ax.set_xlabel("mode index"); ax.set_ylabel("$\\lambda(L_\\mathcal{F})$")
+    ax.set_xticks(idx)
+    ax.legend(fontsize=6, loc="upper left", frameon=False, bbox_to_anchor=(0.02, 0.98))
+    ax.set_title("E1 gauge spectrum: three zeros, one anchor removes them")
     out(fig, "tcns_e1_spectrum")
 
 

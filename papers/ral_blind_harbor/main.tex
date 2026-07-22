@@ -5,6 +5,7 @@
 \usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
 \newtheorem{theorem}{Theorem}\newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
 \newcommand{\provtag}{\textsc{[proven]}}
 \newcommand{\conjtag}{\textsc{[conjectural]}}
 \graphicspath{{figures/}}
@@ -34,10 +35,11 @@ propagates---the gauge-pinning corollary acting in closed loop. Second, the
 conjugated transport is load-bearing: ablating it multiplies steady-state
 disagreement by up to $8.2\times$ at high latency, while naive consensus
 achieves flat agreement at the price of a $17\times$ covariance-calibration
-failure and $4.4\times$ the drift of running no fusion at all. Third, under a
+failure and $4.4\times$ the drift of dead-reckoning, both at the calibration
+horizon. Third, under a
 pre-registered protocol with in-situ noise-floor controls, the conjectured
 second-order scaling of the closed-loop disagreement floor is \emph{falsified}
-at these scales on two independent plants (measured slope $\approx$1.05--1.13,
+at these scales on two independent plants (measured slope $\approx$1.08--1.10,
 cross-tier equivalent): the second-order holonomy mechanism of the theory is
 resolved only in noise-free conditions, an order separation we decompose with a
 full variance attribution across fusion rules, maneuver controls, and formation
@@ -362,9 +364,9 @@ l(\cos\sigma, \sin\sigma)\bigr) \in SE(2),
 \end{equation}
 so that $g_{\mathrm{vessel}} = g_L\, m(s)$ and the edge maps
 $g_i^{-1} g_j = m_i^{-1} m_j$ are independent of the load pose $g_L$
-(Lemmas~3.1--3.2 of the companion) --- the structural fact that makes
+(Lemmas~\ref{lem:m}--\ref{lem:edge}) --- the structural fact that makes
 per-agent load estimation from purely local sensing well posed, and the origin
-of the three-dimensional gauge kernel (Thm~5.1, companion, proven).
+of the three-dimensional gauge kernel (Thm~\ref{thm:gaugeF}, proven).
 
 Each agent carries: the load-pose estimate $\hat G \in SE(2)$; the shape
 estimate $\hat s = (\hat\sigma, \hat\sigma_i)$; the gyro-integrated own heading
@@ -445,20 +447,30 @@ T \;=\; H^{\mathrm{stale}}_j\, m(\hat s_j)^{-1}\,
 i.e., the receiver fast-forwards the stale packet by \emph{its own} current
 load-twist estimate; the correction applied is $\hat G \leftarrow \hat G\,
 \mathrm{Exp}(\alpha\, \mathrm{Log}(\hat G^{-1} T))$ with fixed gain
-$\alpha = \kappa_g \Delta_c$. Two properties make this rule the design under
-test. \emph{(Exactness at frozen shapes.)} If shapes are constant and
-propagation is noise-free, the fused residual vanishes identically: both
-agents integrate the same load twist through constant conjugations, so the
-fast-forwarded stale packet reproduces the receiver's estimate exactly. This
-is verified to machine precision ($D_{ss} \sim 10^{-29}$) on both harness
-generations and pinned by a regression test; it implies the closed-loop floor
-is excited \emph{only} by shape motion, the mechanism check of
-Sec.~\ref{sec:results}. \emph{(First-order mismatch.)} With moving shapes the
-composite carries the staleness of $\hat s$ inside $\hat\xi$, producing the
-$O(\tau)$ transport-mismatch channel that dominates closed-loop disagreement
-at realistic noise --- distinct from the $O(\tau^2)$ holonomy of the
-companion's theorem, which lives at the error-transport level.
-Optional edge weights follow the companion's Def.~4.1 series-information form,
+$\alpha = \kappa_g \Delta_c$. The defining property of this executed composite
+--- and this paper's first theoretical contribution --- is that it is exact at
+frozen shapes and only first-order in the staleness once shapes move.
+
+\begin{proposition}[Executed-composite exactness; shape motion is the sole
+floor excitation]\label{prop:exact}
+Under the executed composite \eqref{eq:composite}, if the channel shapes are
+constant ($\dot{\hat s} = 0$) and propagation is noise-free, the fused residual
+$\mathrm{Log}(\hat G^{-1} T)$ vanishes identically for every lag $\tau$: sender
+and receiver integrate the same load twist through constant conjugations, so the
+fast-forwarded stale packet reproduces the receiver's estimate exactly. Hence
+the closed-loop disagreement floor is excited \emph{only} by shape motion. With
+moving shapes the composite carries the staleness of $\hat s$ inside
+$\hat\xi_{\mathrm{self}}$, producing an $O(\tau)$ transport-mismatch channel ---
+distinct from, and dominating at realistic noise, the $O(\tau^2)$
+error-transport holonomy of Thm~\ref{thm:floorF}, which lives at the
+error-transport level.
+\end{proposition}
+\noindent The exactness is verified to machine precision ($D_{ss} \sim
+10^{-29}$) on both harness generations and pinned by a regression test; the
+sole-excitation consequence is the mechanism check of Sec.~\ref{sec:results},
+and the $O(\tau)$ channel is the one the closed-loop floor measurements of
+Fig.~\ref{fig:f4b} isolate.
+Optional edge weights follow the series-information form of Def.~\ref{def:sheafF},
 $w_e = (1/\iota_i + 1/\iota_j)^{-1}$ with $\iota = \cos^2\!\sigma_i /
 \cos^4\!\sigma$ (the ablation of Sec.~\ref{sec:results} measures their
 benefit).
@@ -482,17 +494,17 @@ directions, a boundary this paper measures rather than hides.
 \subsection{Theoretical positioning and contributions}
 The proven results this paper builds on belong to the companion and are used
 with their hedges: the three-dimensional gauge kernel and its collapse under a
-single anchor (Thm~5.1, Cor~5.2; proven); contraction of the gauge complement
+single anchor (Thm~\ref{thm:gaugeF}, Cor~\ref{cor:pinF}; proven); contraction of the gauge complement
 at rate governed by $\kappa\lambda_2$ for the frozen/LTV linearization
-(Thm~6.3, an inequality; tested in its domain in Sec.~\ref{sec:results});
+(Thm~\ref{thm:contractF}, an inequality; tested in its domain in Sec.~\ref{sec:results});
 and the leading-order, deterministic error-transport holonomy
 $\|\mathrm{Log\,Hol}\| = \tau^2\|[C_i, C_j]\| + O(\tau^3)$ with
 $C_j = \mathrm{Ad}_{m(s_j)}\,\mathrm{ad}_\xi\,\mathrm{Ad}_{m(s_j)}^{-1}$
-(Thm~7.2 with Cor~7.3; proven, with the stochastic steady-state floor
+(Thm~\ref{thm:floorF} with Cor~\ref{cor:symF}; proven, with the stochastic steady-state floor
 explicitly conjectural). Against that backdrop, this paper's own theoretical
 contributions are: (i)~the executed-composite reduction
 \eqref{eq:composite} of the companion's fusion rule, with the frozen-shape
-exactness property and its corollary that shape motion is the sole excitation
+exactness property (Prop.~\ref{prop:exact}) and its corollary that shape motion is the sole excitation
 of the closed-loop floor; (ii)~the epistemic-ladder experimental framework ---
 three staleness exponents attached to three distinct objects (state-level
 mismatch, closed-loop floor, error-transport holonomy), with pre-registered
@@ -570,10 +582,30 @@ hero v1/v2 & transit; decel remedy & Fig.~\ref{fig:heroseries},
 
 \section{Results}\label{sec:results}
 
-\subsection{Gauge pinning (Cor.~5.2 in closed loop)}
-Through 400\,s of GNSS denial the five per-agent estimates drift as one rigid
+\subsection{Gauge pinning (Cor.~\ref{cor:pinF} in closed loop)}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{tcns_e1_spectrum.pdf}
+  \caption{The gauge, computed directly rather than inferred: the sheaf
+  Laplacian $L_\mathcal{F}$ (Def.~\ref{def:sheafF}) has exactly three
+  eigenvalues at machine zero --- $\ker L_\mathcal{F} \cong \mathfrak{se}(2)$,
+  the one global $SE(2)$ gauge of Thm~\ref{thm:gaugeF} --- and a single
+  full-rank anchor lifts all three off zero, its $\lambda_{\min} = 0.18$
+  becoming the relevant rate (Cor.~\ref{cor:pinF}). Structural and shape-only,
+  hence plant-independent; the closed-loop realization is
+  Figs.~\ref{fig:gaugeorbit}--\ref{fig:gaugeerr}.}
+  \label{fig:gaugespec}
+\end{figure}
+The gauge is not merely inferred from the closed-loop drift; it is computable
+directly from the sheaf Laplacian. Figure~\ref{fig:gaugespec} assembles
+$L_\mathcal{F}$ (Def.~\ref{def:sheafF}) on the triangle and finds exactly three
+eigenvalues at machine zero --- the $\ker L_\mathcal{F} \cong \mathfrak{se}(2)$
+of Thm~\ref{thm:gaugeF}, annihilated to $1.1\times10^{-15}$ --- while a single
+full-rank anchor lifts all three off zero ($\lambda_{\min} = 0.18$), exactly the
+collapse of Cor.~\ref{cor:pinF}. The closed loop realizes this structure:
+through 400\,s of GNSS denial the five per-agent estimates drift as one rigid
 gauge orbit --- kernel-projected error grows unbounded while the complement
-stays two orders smaller (Thm~5.1's structure; Figs.~\ref{fig:gaugeorbit},~\ref{fig:heroD} and
+stays two orders smaller (Thm~\ref{thm:gaugeF}'s structure; Figs.~\ref{fig:gaugeorbit},~\ref{fig:heroD} and
 supplementary videos S1--S2). At beacon acquisition the disagreement
 \emph{spikes}: the anchored agent snaps toward truth while its neighbors still
 carry the drifted gauge, and the pin propagates at the network diffusion rate
@@ -637,7 +669,7 @@ below.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{ral_gauge_trails.pdf}
-  \caption{Cor.~5.2 in the closed loop, spatially: the five agents' load-pose
+  \caption{Cor.~\ref{cor:pinF} in the closed loop, spatially: the five agents' load-pose
   estimates (colours) stay a tight, consistent fleet but drift as a group off
   the truth (black) through GNSS denial, then collapse toward it once the dock
   beacon is acquired (solid $\to$ dashed). From the committed
@@ -757,7 +789,7 @@ trim-contamination hypothesis for the same effect was tested and falsified
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{ral_f4a.pdf}
-  \caption{Error-transport holonomy amplitude on both plants. Thm~7.2
+  \caption{Error-transport holonomy amplitude on both plants. Thm~\ref{thm:floorF}
   (leading-order, deterministic): Tier-1 slope 1.999 with switch-offs at machine
   zero; Drake slope 2.000 with the $m{=}2$ coefficient check at 1.0000, the
   $\eta{=}0$ switch-off at machine zero, and the parallel class suppressing the
@@ -772,7 +804,7 @@ trim-contamination hypothesis for the same effect was tested and falsified
   \includegraphics[width=\linewidth]{ral_f4b.pdf}
   \caption{Tier-1/Tier-2 agreement on the conjectured steady-state floor
   ([ES~\S10(ii)]). The leading-order, deterministic holonomy amplitude of
-  Thm~7.2 is tested separately in Fig.~\ref{fig:f4a}. With $D_0$ measured in situ by
+  Thm~\ref{thm:floorF} is tested separately in Fig.~\ref{fig:f4a}. With $D_0$ measured in situ by
   straight-tow controls, the fitted excess exponents are 1.101 [1.076, 1.125]
   (Tier-1) and 1.077 [1.054, 1.102] (Drake); the pre-registered equivalence test
   passes ($+0.023$ [$-0.012$, $+0.057$] $\subset$ [$-0.2$, $0.2$]) and the
@@ -789,8 +821,9 @@ trim-contamination hypothesis for the same effect was tested and falsified
   \caption{All Drake arms on matched formation draws. Ablating the conjugated
   transport (A2) runs $1.7\times\!\to\!8.2\times$ above the paper rule with
   growing $\tau$; naive consensus (A1) holds disagreement flat and low---by
-  groupthink (anchored ANEES 62, drift 8.4~m; baselines cell, 130\,s
-  horizon): agreement alone is never a virtue metric. The straight-tow control shows the motion excitation
+  groupthink (anchored ANEES 62 vs.\ the paper rule's 3.6, and drift 8.4~m vs.\
+  dead-reckoning's 1.9~m --- the $17\times$ and $4.4\times$ of the abstract;
+  baselines cell, 130\,s horizon): agreement alone is never a virtue metric. The straight-tow control shows the motion excitation
   ($19$--$21\times$ at every $\tau$).}
   \label{fig:f4c}
 \end{figure}
@@ -1044,7 +1077,7 @@ docking scorecard as the closing card.
 ghost-caisson overlays: each agent's private load estimate drawn as a
 translucent caisson --- coherently drifting, overlapping each other while
 offset from truth --- and the $D(t)$ spike at acquisition, which is
-Cor.~5.2 live. (Playback $\approx 4.8\times$ real time: stride-2 frames of
+Cor.~\ref{cor:pinF} live. (Playback $\approx 4.8\times$ real time: stride-2 frames of
 the 10\,Hz log at 24\,fps.)
 
 \emph{S3 (tow\_N5.mp4).} The physical scenario itself: the $N{=}5$ pentagon
